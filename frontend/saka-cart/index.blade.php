@@ -115,7 +115,7 @@
             <div class="row">
                <div class="col-lg-12">
                   <div class="section__text-wrap">
-                     <h1 class="section__heading u-c-secondary u-s-m-b-12">{{ __('Discount Available') }}</h1>
+                     <h1 class="section__heading u-c-secondary u-s-m-b-12">{{ __('Discount Avaible') }}</h1>
                      <span class="section__span u-c-silver">{{ __('Grab The Best One') }}</span>
                   </div>
                </div>

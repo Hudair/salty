@@ -134,13 +134,14 @@
                                     @foreach ($option->childrenCategories as $row)
                                   
                                     <li><label class="selectgroup-item option option{{ $row->id }}">
-                                        <input hidden  data-amount="{{ $row->amount }}" data-amounttype="{{ $row->amount_type }}"  @if($option->select_type == 1) type="checkbox" name="option[]" @else type="radio" name="option[{{ $key }}]" @endif  value="{{ $row->id }}" class="selectgroup-input options @if($option->is_required == 1) req @endif" >
+                                        <input hidden  data-amount="{{ $row->amount }}" data-amounttype="{{ $row->amount_type }}"  @if($option->select_type == 1) type="checkbox" @else type="radio" @endif name="option[]" value="{{ $row->id }}" class="selectgroup-input options @if($option->is_required == 1) req @endif" >
                                         <span class="selectgroup-button">{{ $row->name }}</span>
                                         </label></li>
                                     @endforeach
                                 </ul>
                             </div>   
                             @endforeach
+
                             </form>
                            <hr>
                            @if(count($info->categories) > 0)
@@ -222,8 +223,8 @@
                                     @csrf
                                     <h3>{{ __('Leave Your Review') }}</h3>
                                     <div class="grid-input">
-                                        <input type="text" value="{{ Auth::guard('customer')->user()->name ?? '' }}" name="name" placeholder="Your name" required readonly>
-                                        <input type="email" name="email" placeholder="Your email" required readonly value="{{ Auth::guard('customer')->user()->email ?? '' }}">
+                                        <input type="text" value="{{ Auth::user()->name ?? '' }}" name="name" placeholder="Your name" required readonly>
+                                        <input type="email" name="email" placeholder="Your email" required readonly value="{{ Auth::user()->email ?? '' }}">
                                     </div>
                                     <div class="row-input">
                                         <textarea placeholder="Your quote" name="comment" maxlength="200"></textarea>
@@ -235,13 +236,13 @@
                                         <input type="checkbox" value="2" name="rating" id="star4"><label for="star4"></label>
                                         <input type="checkbox" value="1" name="rating" id="star5"><label for="star5"></label>
                                     </div>
-                                    @if(Auth::guard('customer')->check())
+                                    @if(Auth::check())
                                     <button type="submit" class="btn btn-outline review_btn">
                                         <i class="fas fa-paper-plane"></i>
                                        {{ __('Send Review') }}
                                     </button>
                                     @else
-                                    <a href="{{ url('/user/login') }}" class="btn btn-outline review_btn">
+                                    <a href="{{ url('/customer/login') }}" class="btn btn-outline review_btn">
                                        <i class="fas fa-sign-in-alt"></i>
                                        {{ __('Please Login') }}
                                     </a>

@@ -5,11 +5,11 @@
 		@csrf
 		<p class="bigbag-form-row bigbag-form-row--last form-row form-row-wide">
 			<label for="account_last_name">{{ __('Name') }} &nbsp;<span class="required">*</span></label>
-			<input type="text" class="bigbag-Input" name="name" id="account_last_name"  required="" value="{{ Auth::guard('customer')->user()->name }}">
+			<input type="text" class="bigbag-Input" name="name" id="account_last_name"  required="" value="{{ Auth::user()->name }}">
 		</p>
 		<p class="bigbag-form-row bigbag-form-row--last form-row form-row-wide">
 			<label for="email">{{ __('Email') }} &nbsp;<span class="required">*</span></label>
-			<input type="email" class="bigbag-Input" name="email" id="email"  required="" value="{{ Auth::guard('customer')->user()->email }}">
+			<input type="email" class="bigbag-Input" name="email" id="email"  required="" value="{{ Auth::user()->email }}">
 		</p>
 		<div class="clear"></div>		
 

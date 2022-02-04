@@ -41,14 +41,7 @@
                                   {{ $message }}
                                 </div>
                                 @enderror
-
-                                @if(session('error'))
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                  {{session('error')}}
-                                </button>
-                              </div>
-                              @endif
-                                <form action="{{ url('/customer/login') }}" method="POST" class="l-f-o__form basicform">
+                                <form action="{{ route('login') }}" method="POST" class="l-f-o__form basicform">
                                     @csrf
                                     <div class="u-s-m-b-30">
 
@@ -67,7 +60,7 @@
                                             <button class="btn btn--e-transparent-brand-b-2 basicbtn" type="submit">{{ __('Login') }}</button></div>
                                         <div class="u-s-m-b-30">
 
-                                            <a class="gl-link" href="{{ url('/user/password/reset') }}">{{ __('Lost Your Password?') }}</a></div>
+                                            <a class="gl-link" href="{{ url('/password/reset') }}">{{ __('Lost Your Password?') }}</a></div>
                                     </div>
                                     <div class="u-s-m-b-30">
 

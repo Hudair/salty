@@ -53,7 +53,7 @@
                             <div class="dash__box dash__box--bg-white dash__box--shadow u-s-m-b-30">
                                 <div class="dash__pad-1">
 
-                                    <span class="dash__text u-s-m-b-16">Hello, <b>{{ Auth::guard('customer')->user()->name }}</b></span>
+                                    <span class="dash__text u-s-m-b-16">Hello, <b>{{ Auth::user()->name }}</b></span>
                                     <ul class="dash__f-list">
                                         <li class="bigbag-MyAccount-navigation-link bigbag-MyAccount-navigation-link--dashboard ">
                                             <a class="@if(url()->current() == url('/user/dashboard')) dash-active @endif" href="{{ url('/user/dashboard') }}">{{ __('Dashboard') }}</a>
@@ -91,7 +91,4 @@
     <!--====== End - Section 2 ======-->
 </div>
 <!--====== End - App Content ======-->
-<form id="logout-form" action="{{ url('/logout') }}" method="POST" class="d-none">
-  @csrf
-</form>
 @endsection

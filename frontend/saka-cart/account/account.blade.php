@@ -16,13 +16,13 @@
 
                             <label class="gl-label" for="reg-fname">{{ __('Name') }} *</label>
                             
-                            <input class="input-text input-text--primary-style" type="text" id="reg-fname" name="name" required="" value="{{ Auth::guard('customer')->user()->name }}">
+                            <input class="input-text input-text--primary-style" type="text" id="reg-fname" name="name" required="" value="{{ Auth::user()->name }}">
                         </div>
                         <div class="u-s-m-b-30">
 
                             <label class="gl-label" for="reg-lname">{{ __('Email') }} *</label>
 
-                            <input class="input-text input-text--primary-style" type="email" id="reg-lname" name="email" required="" value="{{ Auth::guard('customer')->user()->email }}"></div>
+                            <input class="input-text input-text--primary-style" type="email" id="reg-lname" name="email" required="" value="{{ Auth::user()->email }}"></div>
                     </div>
                     
                    
