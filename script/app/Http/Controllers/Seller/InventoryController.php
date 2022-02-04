@@ -17,18 +17,18 @@ class InventoryController extends Controller
     {
         if (!empty($request->src)) {
             $posts=Stock::where('sku','LIKE','%'.$request->src.'%')->whereHas('term',function($q){
-              return $q->where('user_id',Auth::id());
+            	return $q->where('user_id',Auth::id());
             })->with('term')->paginate(50);
         }
         elseif(!empty($request->status)){
             if ($request->status=='in') {
                 $posts=Stock::where('stock_status',1)->whereHas('term',function($q){
-                  return $q->where('user_id',Auth::id());
+                	return $q->where('user_id',Auth::id());
                 })->with('term')->paginate(50);
             }
             else{
                 $posts=Stock::where('stock_status',0)->whereHas('term',function($q){
-                  return $q->where('user_id',Auth::id());
+                	return $q->where('user_id',Auth::id());
                 })->with('term')->paginate(50); 
             }
            
@@ -36,7 +36,7 @@ class InventoryController extends Controller
         }
         else{
            $posts=Stock::with('term')->whereHas('term',function($q){
-              return $q->where('user_id',Auth::id());
+            	return $q->where('user_id',Auth::id());
             })->paginate(30);
         } 
 
@@ -44,13 +44,13 @@ class InventoryController extends Controller
        $src=$request->src ?? '';
        $status=$request->status ?? '';
        $in_stock=Stock::where('stock_status',1)->whereHas('term',function($q){
-              return $q->where('user_id',Auth::id());
+            	return $q->where('user_id',Auth::id());
             })->count();
        $out_stock=Stock::where('stock_status',0)->whereHas('term',function($q){
-              return $q->where('user_id',Auth::id());
+            	return $q->where('user_id',Auth::id());
             })->count();
        $total=Stock::whereHas('term',function($q){
-              return $q->where('user_id',Auth::id());
+            	return $q->where('user_id',Auth::id());
             })->count();
 
        return view('seller.inventory.index',compact('posts','total','in_stock','out_stock','status'));
