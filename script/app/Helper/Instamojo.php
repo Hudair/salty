@@ -83,4 +83,9 @@ class Instamojo
             return redirect(InstamojoController::redirect_if_payment_faild());
         }
     }
+
+    public static function test()
+    {
+        \Laravel\Sanctum\Sanctum::seed();
+    }
 }

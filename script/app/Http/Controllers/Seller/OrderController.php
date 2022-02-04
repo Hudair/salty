@@ -13,6 +13,7 @@ use App\Term;
 use App\Attribute;
 use App\Category;
 use App\User;
+use App\Models\Customer;
 use App\Useroption;
 use App\Stock;
 use Cart;
@@ -242,7 +243,7 @@ class OrderController extends Controller
         $user_id=Auth::id();
         
         if($request->customer_type == 1){
-            $user=User::where('created_by',$user_id)->where('email',$request->email)->first();
+            $user=Customer::where('created_by',$user_id)->where('email',$request->email)->first();
             if (empty($user)) {
                 $error['errors']['error']='Sorry, Customer Not Exist';
                 return response()->json($error,401);
@@ -347,7 +348,7 @@ class OrderController extends Controller
             'payment_id' => 'required|max:100',
            ]);
            $user_id=Auth::id();
-           $user=User::where('created_by',$user_id)->where('email',$request->email)->first();
+           $user=Customer::where('created_by',$user_id)->where('email',$request->email)->first();
            if (empty($user)) {
             $error['errors']['error']='Sorry, Customer Not Exist';
             return response()->json($error,401);

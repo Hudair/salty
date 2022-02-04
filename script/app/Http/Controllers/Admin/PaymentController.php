@@ -116,6 +116,11 @@ class PaymentController extends Controller
          $data['secret_key']=$request->secret_key;
          $data['currency']=$request->currency;
         }
+        if ($info->slug=='mercado') {
+         $data['public_key']=$request->public_key;
+         $data['access_token']=$request->access_token;
+         
+        }
 
 
 

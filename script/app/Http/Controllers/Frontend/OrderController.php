@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Auth;
 use App\Models\User;
+use App\Models\Customer;
 use App\Models\Userorder;
 use App\Order;
 use App\Orderitem;
@@ -25,9 +26,11 @@ use App\Helper\Order\Toyyibpay;
 use App\Helper\Order\Stripe;
 use App\Helper\Order\Mollie;
 use App\Helper\Order\Paystack;
+use App\Helper\Order\Mercado;
 use Cache;
 use App\Models\Userplanmeta;
 use Str;
+use DB;
 class OrderController extends Controller
 {
     
@@ -65,13 +68,18 @@ class OrderController extends Controller
 
         if($request->create_account == 1){
            $validated = $request->validate([
-            'email' => 'required|email|unique:users|max:100',
+            'email' => 'required|email|max:100',
             'password' => 'required|min:8',
           ]);
-
+           $check_is_exist=Customer::where('email',$request->email)->where('created_by',domain_info('user_id'))->first();
+           if (!empty($check_is_exist)) {
+            Session::flash('user_limit','Opps email address already exists');
+            
+            return back();
+           }
            $plan=Userplanmeta::where('user_id',$user_id)->first();
            $user_limit=$plan->customer_limit ?? 0;
-           $total_customers=User::where('created_by',$user_id)->count();
+           $total_customers=Customer::where('created_by',$user_id)->count();
 
            if($user_limit <= $total_customers){
             Session::flash('user_limit','Opps something wrong with registration but you can make order');
@@ -82,15 +90,14 @@ class OrderController extends Controller
              Session::forget('registration');
             }
 
-           $user= new User();
+           $user= new Customer();
            $user->email=$request->email;
            $user->name=$request->name;
            $user->password=Hash::make($request->password);
            $user->domain_id=$domain_id;
            $user->created_by=$user_id;
-           $user->role_id=2;
            $user->save();
-           Auth::loginUsingId($user->id);
+           Auth::guard('customer')->loginUsingId($user->id);
         }
        
         $prefix=Useroption::where('user_id',$user_id)->where('key','order_prefix')->first();
@@ -110,10 +117,14 @@ class OrderController extends Controller
         $payment_id=null;
        }
 
+       DB::beginTransaction();
+       try {
+         
+
        $order=new Order;
        $order->order_no=$prefix;
-       if(Auth::check()){
-       	$order->customer_id=Auth::id();
+       if(Auth::guard('customer')->check()){
+        $order->customer_id=Auth::guard('customer')->user()->id;
        }
        
        $order->user_id  =$user_id;
@@ -148,6 +159,7 @@ class OrderController extends Controller
        foreach (Cart::content() as $key => $row) {
         $options['attribute']= $row->options->attribute;
         $options['options']= $row->options->options;
+
         $data['order_id']=$order->id;
         $data['term_id']=$row->id;
         $data['info']=json_encode($options);
@@ -164,6 +176,11 @@ class OrderController extends Controller
         $ship['shipping_id']=$request->shipping_mode;
         Ordershipping::insert($ship);
       }
+
+      DB::commit();
+     } catch (Exception $e) {
+      DB::rollback();
+     }
       
       Session::put('order_no',$order->order_no);
       if($request->payment_method != 2){
@@ -227,6 +244,15 @@ class OrderController extends Controller
           Session::put('paystack_payment',true);
           return redirect('/payment-with-paystack');
         }
+        if($request->payment_method == 10){
+         try{
+             return Mercado::make_payment($payment_data);
+          }
+          catch(Exception $e){
+             Order::destroy($order->id);
+             return $this->payment_fail();
+          }
+        }
         
       }
         
@@ -257,10 +283,29 @@ class OrderController extends Controller
          }
       }
       catch(Exception $e){
-
+       
       }
 
       Cart::destroy();
+      
+       if(Cache::has(domain_info('user_id').'order_receive_method')){
+                $method=Cache::get(domain_info('user_id').'order_receive_method');
+                
+            }
+            else{
+                $method="email";
+            }
+            
+            if($method == 'whatsapp'){
+               if(Cache::has(domain_info('user_id').'whatsapp')){
+                    $whatsapp=json_decode(Cache::get(domain_info('user_id').'whatsapp'));
+                    $url="https://wa.me/+".$whatsapp->phone_number."?text=My Order No Is ".str_replace('#','',$order->order_no);
+                    return redirect($url);
+            }
+           
+        }
+       
+        
       return redirect('/thanks');
       
     }
@@ -270,10 +315,17 @@ class OrderController extends Controller
       if (Session::has('customer_payment_info')) {
       
         $data= Session::get('customer_payment_info');
+
         $order=Order::findorFail($data['ref_id']);
         $order->transaction_id = $data['payment_id'];
         $order->category_id=$data['getway_id'];
-        $order->payment_status = 1;
+        if (isset($data['payment_status'])) {
+          $order->payment_status = $data['payment_status'];
+        }
+        else{
+           $order->payment_status = 1;
+        }
+       
         $order->save();
         Session::forget('customer_payment_info');
         Cart::destroy();
@@ -297,18 +349,50 @@ class OrderController extends Controller
             $mail_data['site_name']=Cache::get(domain_info('user_id').'shop_name',null);
             $mail_data['order_url']= url('/seller/order',$order->id);
             
+            if(Cache::has(domain_info('user_id').'order_receive_method')){
+                $method=Cache::get(domain_info('user_id').'order_receive_method');
+                
+            }
+            else{
+                $method="email";
+            }
             
-           if(env('QUEUE_MAIL') == 'on'){
+            if($method == 'email'){
+               if(env('QUEUE_MAIL') == 'on'){
             
-             dispatch(new \App\Jobs\Ordernotification($mail_data));
-           }
-           else{
+                dispatch(new \App\Jobs\Ordernotification($mail_data));
+               }
+              else{
             
-             Mail::to($store_email)->send(new SellerOrderMail($mail_data));
-           }
+                Mail::to($store_email)->send(new SellerOrderMail($mail_data));
+               } 
+                return redirect('/thanks');
+            }
+            else{
+                if(Cache::has(domain_info('user_id').'whatsapp')){
+                    $whatsapp=json_decode(Cache::get(domain_info('user_id').'whatsapp'));
+                    $url="https://wa.me/+".$whatsapp->phone_number."?text=My Order No Is ".str_replace('#','',$order->order_no);
+                    return redirect($url);
+                }
+               if(env('QUEUE_MAIL') == 'on'){
+            
+                dispatch(new \App\Jobs\Ordernotification($mail_data));
+               }
+                else{
+            
+                Mail::to($store_email)->send(new SellerOrderMail($mail_data));
+               } 
+                return redirect('/thanks');
+                
+            }
+            
+            
+            
+            
+           
          
         
-        return redirect('/thanks');
+       
       }
 
       abort(404);

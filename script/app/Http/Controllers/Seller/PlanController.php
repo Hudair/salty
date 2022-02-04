@@ -13,6 +13,7 @@ use App\Helper\Subscription\Instamojo;
 use App\Helper\Subscription\Stripe;
 use App\Helper\Subscription\Mollie;
 use App\Helper\Subscription\Paystack;
+use App\Helper\Subscription\Mercado;
 use Session;
 use App\Mail\OrderMail;
 use Illuminate\Support\Facades\Mail;
@@ -20,7 +21,7 @@ use Auth;
 use App\Trasection;
 use App\Models\Userplan;
 use App\Models\Userplanmeta;
-
+use DB;
 class PlanController extends Controller
 {
 	public function make_payment($id)
@@ -78,6 +79,9 @@ class PlanController extends Controller
 		if ($getway->slug=='razorpay') {
 			return redirect('/seller/payment-with/razorpay');
 		}
+		if ($getway->slug=='mercado') {            
+            return Mercado::make_payment($data);
+        }
 	}
 
 
@@ -89,13 +93,19 @@ class PlanController extends Controller
 		if (Session::has('payment_info')) {
 			$data = Session::get('payment_info');
 			$plan=Plan::findorFail($data['ref_id']);
-
+			DB::beginTransaction();
+			try {
 			$transection=new Trasection;
 			$transection->category_id = $data['getway_id'];
 			$transection->trasection_id = $data['payment_id'];
-			$transection->status = 1;
+			if (isset($data['payment_status'])) {
+                $transection->status = $data['payment_status'];
+            }
+            else{
+                $transection->status = 1;
+            }
 			$transection->save();
-
+			
 			$exp_days =  $plan->days;
 			$expiry_date = \Carbon\Carbon::now()->addDays(($exp_days - 1))->format('Y-m-d');
 
@@ -114,13 +124,13 @@ class PlanController extends Controller
 			
 
 			$auto_order=Option::where('key','auto_order')->first();
-             if($auto_order->value == 'yes'){
+             if($auto_order->value == 'yes'  && $transection->status == 1){
                 $user->status=1;
              }
              
             $user->save();
            
-            if($auto_order->value == 'yes'){
+            if($auto_order->value == 'yes' && $transection->status == 1){
                 $meta=Userplanmeta::where('user_id',Auth::id())->first();
                 if(empty($meta)){
                     $meta=new Userplanmeta;
@@ -156,9 +166,14 @@ class PlanController extends Controller
 			}
 
 
-			return redirect('seller/settings/plan');
+			
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
 		}
-		abort(404);
+		}
+		return redirect('seller/settings/plan');
+		
 	}
 
 	public function fail()

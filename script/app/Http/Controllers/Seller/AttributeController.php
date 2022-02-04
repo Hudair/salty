@@ -136,11 +136,19 @@ class AttributeController extends Controller
         $user_id=Auth::id();
         if ($request->method=='delete') {
             foreach ($request->ids as $key => $id) {
+               
+
+              Category::where([
+                ['user_id',$user_id],
+                ['p_id',$id],
+               ])->delete();
+
                $post= Category::where([
-                ['type','parent_attribute'],
                 ['user_id',$user_id]
                ])->findorFail($id);
                $post->delete();
+
+              
             }
         }
 

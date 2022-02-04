@@ -17,22 +17,23 @@ class CustomerMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::User()->role_id == 2) {
+
+        if (Auth::guard('customer')->check()) {
              
-            $url= Auth::user()->user_domain->full_domain;
+            $url= Auth::guard('customer')->user()->user_domain->full_domain ?? '';
 
             if($url != url('/')){
                
-               Auth::logout();
+               Auth::guard('customer')->logout();
                return redirect()->route('login');
             }
            return $next($request);
         }else{
             if(Auth::check()){
+                Auth::guard('customer')->logout();
                 Auth::logout(); 
             }
             return redirect('user/login');
         } 
-        
     }
 }

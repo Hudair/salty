@@ -22,10 +22,10 @@ class TransectionController extends Controller
         $user_id=Auth::id();
         if ($request->src) {
             $this->src=$request->src;
-            $orders=Order::where('transaction_id',$request->src)->with('getway')->where('user_id',$user_id)->paginate(40);
+            $orders=Order::where('transaction_id',$request->src)->latest()->with('getway')->where('user_id',$user_id)->paginate(40);
         }
         else{
-           $orders=Order::with('getway')->where('user_id',$user_id)->paginate(40);
+           $orders=Order::with('getway')->where('user_id',$user_id)->latest()->paginate(40);
        }
        
        $getways=Getway::where('user_id',$user_id)->with('method')->get();

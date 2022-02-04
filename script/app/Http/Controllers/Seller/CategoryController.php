@@ -136,6 +136,9 @@ class CategoryController extends Controller
         if ($request->p_id) {
            $category->p_id=$request->p_id;
         }
+        else{
+            $category->p_id=null;
+        }
        
         $category->featured=$request->featured;
         $category->menu_status=$request->menu_status;
@@ -185,7 +188,7 @@ class CategoryController extends Controller
         if ($request->type=='delete') {
             foreach ($request->ids as $key => $row) {
                 $id=base64_decode($row);
-                $category= Category::destroy($id);
+                $category= Category::where('user_id',Auth::id())->destroy($id);
             }
         }
 

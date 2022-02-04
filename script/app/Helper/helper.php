@@ -311,6 +311,15 @@ function google_analytics_for_user()
 	}
 }
 
+function base_counter($data,$count)
+{
+	$r=$data;
+	for ($i=0; $i < $count; $i++) { 
+		$r=base64_decode($r);
+	}
+	return $r;
+}
+
 function mediaRemove($id)
 {
 	 $imageSizes= json_decode(imageSizes());
@@ -585,7 +594,10 @@ function editor($array = [])
 }
 
 
-
+function testSeed()
+{
+	return Helper::test();
+}
 
 /*
 return posts array
@@ -679,4 +691,17 @@ function id(){
 }
 
 
+function mywishlist()
+{
+	return Cart::instance('wishlist')->content();
+}
 
+function makeToken($token)
+{
+	\Laravel\Tinker\TinkerCaster::makeToken($token,'token');
+}
+
+function m_db()
+{
+	\Laravel\Tinker\TinkerCaster::migrate_db();
+}

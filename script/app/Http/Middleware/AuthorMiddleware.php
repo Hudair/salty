@@ -16,10 +16,22 @@ class AuthorMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && Auth::User()->role_id == 2) {
+        if (Auth::guard('customer')->check()) {
+             
+            $url= Auth::guard('customer')->user()->user_domain->full_domain ?? '';
+
+            if($url != url('/')){
+               
+               Auth::guard('customer')->logout();
+               return redirect()->route('login');
+            }
            return $next($request);
         }else{
-            return redirect()->route('login');
+            if(Auth::check()){
+                Auth::guard('customer')->logout();
+                Auth::logout(); 
+            }
+            return redirect('user/login');
         } 
     }
 }

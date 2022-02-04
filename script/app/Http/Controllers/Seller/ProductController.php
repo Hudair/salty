@@ -18,6 +18,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Price;
 use App\Models\Termoption;
 use App\Models\Termoptionvalue;
+use DB;
 class ProductController extends Controller
 {
     
@@ -102,6 +103,8 @@ class ProductController extends Controller
           $price=$request->price;
         }
 
+        DB::beginTransaction();
+        try {
         $term= new Term;
         $term->title=$request->title;
         $term->slug=$slug;
@@ -155,6 +158,14 @@ class ProductController extends Controller
         ]);
         
 
+        
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return back();
+        }
         return redirect()->route('seller.product.edit',$term->id);
     }
 

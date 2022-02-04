@@ -57,13 +57,13 @@ class LoginController extends Controller
            $url= Auth::user()->user_domain->full_domain;
            if (url('/') != $url) {
              Auth::logout();
-             $this->redirectTo=$url.'/user/login';
+             return $this->redirectTo=$url.'/user/login';
            }
            else{
-             $this->redirectTo=$url.'/user/dashboard';
+           return  $this->redirectTo=$url.'/user/dashboard';
            }
           
-           return $this->redirectTo;
+          
        }
        elseif (Auth::user()->role_id==3) {
         $url= Auth::user()->user_domain->full_domain;

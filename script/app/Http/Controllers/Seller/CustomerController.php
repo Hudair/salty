@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Auth;
-use App\User;
+use App\Models\Customer;
 use Hash;
 class CustomerController extends Controller
 {
@@ -26,10 +26,10 @@ class CustomerController extends Controller
     {
      
         if ($request->src) {
-            $posts=User::where('created_by',Auth::id())->where('role_id',2)->where($request->type,'LIKE','%'.$request->src.'%')->latest()->paginate(50);
+            $posts=Customer::where('created_by',Auth::id())->where($request->type,'LIKE','%'.$request->src.'%')->latest()->paginate(50);
         }
        else{
-         $posts=User::where('created_by',Auth::id())->withCount('orders')->orderBy('orders_count','DESC')->where('role_id',2)->latest()->paginate(20);
+         $posts=Customer::where('created_by',Auth::id())->withCount('orders')->orderBy('orders_count','DESC')->latest()->paginate(20);
        }
 
        $src=$request->src ?? '';
@@ -49,7 +49,7 @@ class CustomerController extends Controller
 
     public function user(Request $request)
     {
-      $user=User::where('created_by',Auth::id())->where('email',$request->email)->first();
+      $user=Customer::where('created_by',Auth::id())->where('email',$request->email)->first();
 
       if (!empty($user)) {
         return $user->id;
@@ -60,9 +60,9 @@ class CustomerController extends Controller
     }
 
     public function login($id){
-     $user=User::where('created_by',Auth::id())->findorFail($id);
+     $user=Customer::where('created_by',Auth::id())->findorFail($id);
      Auth::logout();
-     Auth::loginUsingId($user->id);
+     Auth::guard('customer')->loginUsingId($user->id);
 
      return redirect('/user/dashboard');
     }
@@ -75,7 +75,7 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
        $limit=user_limit();
-        $posts_count=\App\Models\User::where('created_by',Auth::id())->count();
+        $posts_count=Customer::where('created_by',Auth::id())->count();
          if ($limit['customer_limit'] <= $posts_count) {
         
          $error['errors']['error']='Maximum customers limit exceeded';
@@ -89,13 +89,16 @@ class CustomerController extends Controller
         'password' => 'required|min:6',
        ]);
 
+       
+       $check=Customer::where([['created_by',Auth::id()],['email',$request->email]])->first();
+       if(!empty($check)){
+         $error['errors']['error']='Email already exists';
+         return response()->json($error,401);
+       }
        $data=Auth::user();
-
-
-       $user= new User;
+       $user= new Customer;
        $user->name = $request->name;
        $user->email = $request->email;
-       $user->role_id = 2;
        $user->created_by = $data->id;
        $user->domain_id = $data->domain_id;
        $user->password = Hash::make($request->password);
@@ -112,7 +115,7 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
-       $info=User::where('created_by',Auth::id())->where('role_id',2)->withCount('orders','orders_complete','orders_processing')->findorFail($id);
+       $info=Customer::where('created_by',Auth::id())->withCount('orders','orders_complete','orders_processing')->findorFail($id);
        $earnings=\App\Order::where('customer_id',$id)->where('payment_status',1)->sum('total');
        $orders=\App\Order::where('customer_id',$id)->with('payment_method')->withCount('order_item')->latest()->paginate(20);
        return view('seller.customer.show',compact('info','earnings','orders'));
@@ -126,7 +129,7 @@ class CustomerController extends Controller
      */
     public function edit($id)
     {
-       $info=User::where('created_by',Auth::id())->where('role_id',2)->findorFail($id);
+       $info=Customer::where('created_by',Auth::id())->findorFail($id);
        return view('seller.customer.edit',compact('info'));
     }
 
@@ -140,7 +143,7 @@ class CustomerController extends Controller
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
-        'email' => 'required|max:50|email|unique:users,email,' . $id,
+        'email' => 'required|max:50|email|unique:customers,email,' . $id,
         'name' => 'required|max:20',
        
        ]);
@@ -150,7 +153,7 @@ class CustomerController extends Controller
             'password' => 'required|min:6',
           ]);
         }   
-       $user=  User::where('created_by',Auth::id())->where('role_id',2)->findorFail($id);
+       $user=  Customer::where('created_by',Auth::id())->findorFail($id);
        $user->name = $request->name;
        $user->email = $request->email;
        if ($request->change_password) {
@@ -175,7 +178,7 @@ class CustomerController extends Controller
          if ($request->type=='delete') {
             $auth_id=Auth::id();
             foreach ($request->ids as $key => $id) {
-                $user=  User::where('created_by',$auth_id)->where('role_id',2)->findorFail($id);
+                $user=  Customer::where('created_by',$auth_id)->findorFail($id);
                 $user->delete();
             }
             return response()->json(['Customer Deleted']);

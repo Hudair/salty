@@ -126,6 +126,15 @@ class SettingController extends Controller
             $local->value=$request->local;
             $local->user_id=$user_id;
             $local->save();
+            
+            $order_receive_method= Useroption::where('user_id',$user_id)->where('key','order_receive_method')->first();
+            if (empty($order_receive_method)) {
+                $order_receive_method=new Useroption;
+                $order_receive_method->key='order_receive_method';
+            }
+            $order_receive_method->value=$request->order_receive_method;
+            $order_receive_method->user_id=$user_id;
+            $order_receive_method->save();
 
 
 
@@ -210,6 +219,87 @@ class SettingController extends Controller
 
        } 
 
+       if ($request->type=='pwa_settings') {
+        $user_id=Auth::id();
+        $validatedData = $request->validate([
+                'pwa_app_title' => 'required|max:20',
+                'pwa_app_name' => 'required|max:15',
+                'app_lang' => 'required|max:15',
+                'pwa_app_background_color' => 'required|max:15',
+                'pwa_app_theme_color' => 'required|max:15',
+                'app_icon_128x128' => 'max:300|mimes:png',
+                'app_icon_144x144' => 'max:300|mimes:png',
+                'app_icon_152x152' => 'max:300|mimes:png',
+                'app_icon_192x192' => 'max:300|mimes:png',
+                'app_icon_512x512' => 'max:500|mimes:png',
+                'app_icon_256x256' => 'max:400|mimes:png',
+        ]);
+
+        if ($request->app_icon_128x128) {
+             $request->app_icon_128x128->move('uploads/'.$user_id, '128x128.png'); 
+        }
+        if ($request->app_icon_144x144) {
+           $request->app_icon_144x144->move('uploads/'.$user_id, '144x144.png'); 
+        }
+        if ($request->app_icon_152x152) {
+           $request->app_icon_152x152->move('uploads/'.$user_id, '152x152.png'); 
+        }
+        if ($request->app_icon_192x192) {
+         $request->app_icon_192x192->move('uploads/'.$user_id, '192x192.png'); 
+        }
+        if ($request->app_icon_512x512) {
+         $request->app_icon_512x512->move('uploads/'.$user_id, '512x512.png'); 
+        }
+        if ($request->app_icon_256x256) {
+         $request->app_icon_256x256->move('uploads/'.$user_id, '256x256.png'); 
+        }
+
+        $mainfest='{
+  "name": "'.$request->pwa_app_title.'",
+  "short_name": "'.$request->pwa_app_name.'",
+  "icons": [
+    {
+      "src": "'.asset('uploads/'.$user_id.'/192x192.png').'",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "'.asset('uploads/'.$user_id.'/144x144.png').'",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "'.asset('uploads/'.$user_id.'/152x152.png').'",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "'.asset('uploads/'.$user_id.'/192x192.png').'",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "'.asset('uploads/'.$user_id.'/256x256.png').'",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "'.asset('uploads/'.$user_id.'/512x512.png').'",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "lang": "'.$request->app_lang.'",
+  "start_url": "/pwa",
+  "display": "standalone",
+  "background_color": "'.$request->pwa_app_background_color.'",
+  "theme_color": "'.$request->pwa_app_theme_color.'"
+}';
+
+\File::put('uploads/'.$user_id.'/manifest.json',$mainfest);
+
+return response()->json(['Update success']);
+       } 
        if ($request->type=='theme_settings') {
         $user_id=Auth::id();
         $validatedData = $request->validate([
@@ -245,7 +335,7 @@ class SettingController extends Controller
          }
 
          $links=[];
-         foreach ($request->icon as $key => $value) {
+         foreach ($request->icon ?? [] as $key => $value) {
             $data['icon']=$value;
             $data['url']=$request->url[$key];
             array_push($links, $data);
@@ -297,11 +387,21 @@ class SettingController extends Controller
             $socials= Useroption::where('user_id',$user_id)->where('key','socials')->first();
             $local=$local->value ?? ''; 
             $socials=json_decode($socials->value ?? ''); 
-
-           return view('seller.settings.general',compact('shop_name','shop_description','store_email','order_prefix','currency','location','theme_color','langlist','my_languages','tax','local','socials'));
+            if (file_exists('uploads/'.Auth::id().'/manifest.json')) {
+              $pwa=file_get_contents('uploads/'.Auth::id().'/manifest.json');
+              $pwa=json_decode($pwa);
+            }
+            else{
+                $pwa=[];
+            }
+            
+            $order_receive_method= Useroption::where('user_id',$user_id)->where('key','order_receive_method')->first();
+            $order_receive_method= $order_receive_method->value ?? 'email';
+            
+           return view('seller.settings.general',compact('shop_name','order_receive_method','shop_description','store_email','order_prefix','currency','location','theme_color','langlist','my_languages','tax','local','socials','pwa'));
         } 
         if ($slug=='payment') {
-            $posts=Category::with('description','active_getway')->where('type','payment_getway')->where('slug','!=','cod')->where('featured',1)->get();
+            $posts=Category::with('description','active_getway')->where('type','payment_getway')->where('slug','!=','cod')->get();
             $cod=Category::with('description','active_getway')->where('type','payment_getway')->where('slug','cod')->get();
            return view('seller.settings.payment_method',compact('posts','cod'));
         }

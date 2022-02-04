@@ -180,50 +180,8 @@ DEFAULT_LANG=en";
         return "Demo Importing";
     }
 
-    public function seed(Request $request)
-    {
-        ini_set('max_execution_time', '0');
-        \Artisan::call('db:seed');
-         $url=$request->getHost();
-        $url=str_replace('www.','',$url);
-        
-        $file=File::get(base_path('localhost.txt'));
+  
 
-       
-        File::put(base_path().'/routes/web.php',$file);
-        return "Congratulations! Your site is ready";
-    }
+   
 
-
-    public function verify($key)
-    {
-        $check= Everify::Check($key);
-        if ($check==true) {
-            echo "success";
-         }
-        else{
-            echo  Everify::$massage;
-         }
-    }
-
-    public function purchase()
-    {
-        return view('installer.purchase');
-    }
-
-    public function purchase_check(Request $request)
-    {
-        $this->validate($request,[
-            'purchase_code' => 'required'
-        ]);
-
-        $check= Everify::Check($request->purchase_code);
-        if ($check==true) {
-            return redirect()->route('install.info');
-        }
-        else{
-            return back()->with('alert-success',Everify::$massage);
-         }
-
-    }
 }

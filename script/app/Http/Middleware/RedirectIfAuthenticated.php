@@ -22,17 +22,29 @@ class RedirectIfAuthenticated
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
-           if (Auth::guard($guard)->check() && Auth::User()->role_id == 1) {
+         if($guard == "customer"){
+            if (url('/') == env('APP_URL')) {
+               Auth::logout();
+               Auth::guard('customer')->logout();
+            }
+            $url= Auth::guard('customer')->user()->user_domain->full_domain ?? '';
+
+            return redirect($url.'/user/dashboard');
+         }  
+
+         if (Auth::guard($guard)->check() && Auth::User()->role_id == 1) {
              return redirect(env('APP_URL').'/admin/dashboard');
          }
-         elseif (Auth::guard($guard)->check() && Auth::User()->role_id == 2) {
+        elseif (Auth::guard($guard)->check() && Auth::User()->role_id == 2) {
            
-           $url=  Auth::user()->user_domain->full_domain ?? env('APP_APP_URL');
+           $url=  Auth::user()->user_domain->full_domain ?? env('APP_URL');
            
            return redirect($url.'/user/dashboard');
         }
         elseif(Auth::guard($guard)->check() && Auth::User()->role_id == 3)
         {
+            
+
             if (Auth::user()->status==3) {
                 $redirectTo=env('APP_URL').'/merchant/dashboard';
                 return redirect($redirectTo);
@@ -42,8 +54,12 @@ class RedirectIfAuthenticated
                 return redirect($redirectTo);
             }
             else{
-              
-                $url= Auth::user()->user_domain->full_domain ?? env('APP_APP_URL');
+               $url= Auth::user()->user_domain->full_domain ?? env('APP_APP_URL');
+                if (url('/') != $url) {
+                 Auth::logout();
+                 return redirect($url.'/login');
+                }
+                
                return redirect($url.'/seller/dashboard');
             }
            

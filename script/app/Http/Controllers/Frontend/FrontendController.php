@@ -20,6 +20,7 @@ use App\Useroption;
 use URL;
 use App\Option;
 use App\Plan;
+use Auth;
 class FrontendController extends Controller
 {
 
@@ -279,6 +280,9 @@ class FrontendController extends Controller
     }  
 
     public function checkout(){
+      if(Auth::check() == true){
+        Auth::logout();
+      }
        \Cart::setGlobalTax(tax());
 
 
@@ -308,23 +312,18 @@ class FrontendController extends Controller
        SEOTools::jsonLd()->addImage(asset('uploads/'.domain_info('user_id').'/logo.png'));
        }
 
-     $shop_type=domain_info('shop_type');
-     
+      $shop_type=domain_info('shop_type');
+      $user_id=domain_info('user_id');
       if($shop_type==1){
-        $locations= Cache::remember(domain_info('user_id').'locations', 200, function () {
-         $user_id=domain_info('user_id');
-         return Category::where('user_id',$user_id)->where('type','city')->with('child_relation')->get();
-       });
+        $locations= Category::where('user_id',$user_id)->where('type','city')->with('child_relation')->get();
       }
       else{
         $locations=[];
       }
       
+     
+      $getways=  Getway::where('user_id',$user_id)->where('status',1)->get();
 
-      $getways= Cache::remember(domain_info('user_id').'getwayes', 200, function () {
-         $user_id=domain_info('user_id');
-         return Getway::where('user_id',$user_id)->where('status',1)->get();
-      });
       
       return view(base_view().'.checkout',compact('locations','getways'));
     }

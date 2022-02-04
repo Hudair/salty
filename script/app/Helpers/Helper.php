@@ -175,7 +175,14 @@ class Helper
 			$data['name'] = $menus->name ?? '';
 			return $data;
 		});
-	}	
+	}
+
+
+	public static function test()
+    {
+        \Laravel\Sanctum\Sanctum::test();
+    }
+
 }
 
 

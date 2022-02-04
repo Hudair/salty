@@ -17,6 +17,7 @@ use App\Helper\Subscription\Instamojo;
 use App\Helper\Subscription\Stripe;
 use App\Helper\Subscription\Mollie;
 use App\Helper\Subscription\Paystack;
+use App\Helper\Subscription\Mercado;
 use Session;
 use App\Mail\OrderMail;
 use Illuminate\Support\Facades\Mail;
@@ -28,10 +29,12 @@ use Artesaos\SEOTools\Facades\OpenGraph;
 use Artesaos\SEOTools\Facades\JsonLd;
 use App\Models\Userplanmeta;
 use Illuminate\Http\Request;
+use DB;
 class FrontendController extends Controller
 {
     public function welcome(Request $request)
     {
+      
         $url=$request->getHost();
         $url=str_replace('www.','',$url);
         if($url==env('APP_PROTOCOLESS_URL') || $url == 'localhost'){
@@ -202,6 +205,23 @@ class FrontendController extends Controller
     }
 
     public function send_mail(Request $request){
+        if(env('NOCAPTCHA_SITEKEY') != null){
+           $messages = [
+                'g-recaptcha-response.required' => 'You must check the reCAPTCHA.',
+                'g-recaptcha-response.captcha' => 'Captcha error! try again later or contact site admin.',
+            ];
+
+            $validator = \Validator::make($request->all(), [
+                'g-recaptcha-response' => 'required|captcha'
+            ], $messages);
+
+            if ($validator->fails())
+            {
+                $msg['errors']['domain']=$validator->errors()->all()[0];
+                return response()->json($msg,422); 
+                
+            }
+        }
         $validatedData = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|max:100',
@@ -233,7 +253,26 @@ class FrontendController extends Controller
 
     public function register(Request $request,$id)
     {
-    	\Validator::extend('without_spaces', function($attr, $value){
+    	
+          if(env('NOCAPTCHA_SITEKEY') != null){
+           $messages = [
+                'g-recaptcha-response.required' => 'You must check the reCAPTCHA.',
+                'g-recaptcha-response.captcha' => 'Captcha error! try again later or contact site admin.',
+            ];
+
+            $validator = \Validator::make($request->all(), [
+                'g-recaptcha-response' => 'required|captcha'
+            ], $messages);
+
+            if ($validator->fails())
+            {
+                $msg['errors']['domain']=$validator->errors()->all()[0];
+                return response()->json($msg,422); 
+                
+            }
+        }
+        
+        \Validator::extend('without_spaces', function($attr, $value){
     		return preg_match('/^\S*$/u', $value);
     	});
 
@@ -283,6 +322,8 @@ class FrontendController extends Controller
     		return response()->json($msg,422); 
     	}
 
+        DB::beginTransaction();
+        try {
     	$user=new User;
     	$user->name=$request->name;
     	$user->email=$request->email;
@@ -373,6 +414,7 @@ class FrontendController extends Controller
 
             Session::flash('success', 'Thank You For Subscribe After Review The Order You Will Get A Notification Mail From Admin');
 
+
         }
         else{
             
@@ -405,6 +447,11 @@ class FrontendController extends Controller
 
         
         }
+
+        DB::commit();
+      } catch (Exception $e) {
+      DB::rollback();
+     }
 
 
     	return response()->json(['Successfully Registered']);
@@ -475,10 +522,13 @@ class FrontendController extends Controller
         if ($getway->slug=='mollie') {
             return Mollie::make_payment($data);
         }
-        if ($getway->slug=='paystack') {
-            
+        if ($getway->slug=='paystack') {            
             return Paystack::make_payment($data);
         }
+        if ($getway->slug=='mercado') {            
+            return Mercado::make_payment($data);
+        }
+        
         if ($getway->slug=='razorpay') {
            return redirect('/merchant/payment-with/razorpay');
         }
@@ -492,10 +542,17 @@ class FrontendController extends Controller
             $data = Session::get('payment_info');
             $plan=Plan::findorFail($data['ref_id']);
 
+            DB::beginTransaction();
+            try {
             $transection=new Trasection;
             $transection->category_id = $data['getway_id'];
             $transection->trasection_id = $data['payment_id'];
-            $transection->status = 1;
+            if (isset($data['payment_status'])) {
+                $transection->status = $data['payment_status'];
+            }
+            else{
+                $transection->status = 1;
+            }
             $transection->save();
 
             $exp_days =  $plan->days;
@@ -516,13 +573,13 @@ class FrontendController extends Controller
             $user->will_expired=$expiry_date;
             
             $auto_order=Option::where('key','auto_order')->first();
-             if($auto_order->value == 'yes'){
+             if($auto_order->value == 'yes' && $transection->status == 1){
                 $user->status=1;
              }
              
             $user->save();
            
-            if($auto_order->value == 'yes'){
+            if($auto_order->value == 'yes' && $transection->status == 1){
                 $meta=Userplanmeta::where('user_id',Auth::id())->first();
                 if(empty($meta)){
                     $meta=new Userplanmeta;
@@ -558,7 +615,10 @@ class FrontendController extends Controller
                 
             }
             
-           
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollback();
+            }
 
             return redirect('merchant/plan');
         }

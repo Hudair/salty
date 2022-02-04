@@ -13,6 +13,7 @@ use App\Plan;
 use App\Term;
 use Hash;
 use App\Models\Userplanmeta;
+use App\Models\Customer;
 class CustomerController extends Controller
 {
     protected $request;
@@ -199,11 +200,38 @@ class CustomerController extends Controller
        $info=User::withCount('term','orders','customers')->where('role_id',3)->with('user_domain','user_plan')->findorFail($id);
        $histories=Userplan::with('plan_info','payment_method')->where('user_id',$id)->latest()->paginate(20);
 
-        $customers=User::withCount('orders')->where('created_by',$id)->where('role_id',2)->latest()->paginate(20);
+        $customers=Customer::withCount('orders')->where('created_by',$id)->latest()->paginate(20);
         $posts=\App\Term::where('user_id',$id)->latest()->paginate(40);
        return view('admin.customer.show',compact('info','histories','customers','posts'));
     }
 
+    public function planview($id)
+    {
+       if (!Auth()->user()->can('customer.edit')) {
+            return abort(401);
+       }
+
+       $info=User::withCount('term','orders','customers')->where('role_id',3)->findorFail($id);
+      
+       $planinfo=Userplanmeta::where('user_id',$id)->first();
+       abort_if(empty($planinfo),404);
+       return view('admin.customer.planinfo',compact('info','planinfo'));
+    }
+
+    public function updateplaninfo(Request $request, $id)
+    {
+       $planinfo=Userplanmeta::findorFail($id);
+       $planinfo->product_limit=$request->product_limit;
+       $planinfo->storage=$request->storage;
+       $planinfo->customer_limit=$request->customer_limit;
+       $planinfo->category_limit=$request->category_limit;
+       $planinfo->location_limit=$request->location_limit;
+       $planinfo->brand_limit=$request->brand_limit;
+       $planinfo->variation_limit=$request->variation_limit;
+       $planinfo->save();
+
+       return response()->json('Info Updated Successfully');
+    }
     /**
      * Show the form for editing the specified resource.
      *
@@ -266,7 +294,7 @@ class CustomerController extends Controller
         }
         elseif ($request->type=="user_delete") {
             foreach ($request->ids ?? [] as $key => $id) {
-                \App\User::destroy($id);
+                \App\Models\Customer::destroy($id);
             }
         }
         else{

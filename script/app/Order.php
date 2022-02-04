@@ -8,7 +8,7 @@ class Order extends Model
 {
     public function customer()
     {
-    	return $this->hasOne('App\User','id','customer_id');
+    	return $this->hasOne('App\Models\Customer','id','customer_id');
     }
 
     public function order_items()

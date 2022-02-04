@@ -78,6 +78,13 @@ class GetwayController extends Controller
                 $data['public_key']='';
                 $data['secret_key']='';
             }
+            elseif($getway->slug=='mercado'){
+                $data['title']='mercadopago';
+                $data['description']='';
+                $data['public_key']='';
+                $data['access_token']='';
+                 $data['env']='production';
+            }
             
             else{
                 return back();
@@ -180,6 +187,12 @@ class GetwayController extends Controller
             $data['currency']=strtoupper($request->currency);
             $data['public_key']=$request->public_key;
             $data['secret_key']=$request->secret_key;
+        }
+        elseif($info->method->slug=='mercado'){
+            $data['title']=$request->name;           
+            $data['public_key']=$request->public_key;
+            $data['access_token']=$request->access_token;
+            $data['env']=$request->env ?? 'production';
         }
 
         $info->content=json_encode($data);
