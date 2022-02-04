@@ -1,8 +1,8 @@
 @php
-$cart_count=Cart::count();
-$cart_content=Cart::content();
-$cart_subtotal=Cart::subtotal();
-$cart_total=Cart::total();
+$cart_count=Cart::instance('default')->count();
+$cart_content=Cart::instance('default')->content();
+$cart_subtotal=Cart::instance('default')->subtotal();
+$cart_total=Cart::instance('default')->total();
 $wishlist=Cart::instance('wishlist')->count();
 @endphp
 <!--=====================================

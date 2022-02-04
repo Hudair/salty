@@ -1,8 +1,8 @@
 @php
-$cart_count=Cart::count();
-$cart_content=Cart::content();
-$cart_subtotal=Cart::subtotal();
-$cart_total=Cart::total();
+$cart_count=Cart::instance('default')->count();
+$cart_content=Cart::instance('default')->content();
+$cart_subtotal=Cart::instance('default')->subtotal();
+$cart_total=Cart::instance('default')->total();
 $wishlist=Cart::instance('wishlist')->count();
 @endphp
 @if(url('/') == url()->current())
@@ -55,7 +55,7 @@ $wishlist=Cart::instance('wishlist')->count();
                                  <!--====== Dropdown ======-->
                                  <span class="js-menu-toggle"></span>
                                  <ul class="w-120">
-                                    @if(Auth::check())
+                                    @if(Auth::guard('customer')->check())
                                     <li>
                                        <a href="{{ url('/user/dashboard') }}"><i class="fas fa-user-circle u-s-m-r-6"></i>
                                        <span>{{ __('Account') }}</span></a>
@@ -293,7 +293,7 @@ $wishlist=Cart::instance('wishlist')->count();
                         <!--====== Dropdown ======-->
                         <span class="js-menu-toggle"></span>
                         <ul class="w-120">
-                           @if(Auth::check())
+                           @if(Auth::guard('customer')->check())
                            <li>
                               <a href="{{ url('/user/dashboard') }}"><i class="fas fa-user-circle u-s-m-r-6"></i>
                               <span>{{ __('Account') }}</span></a>

@@ -32,7 +32,7 @@
 
                                 
                                 <div class="u-s-m-b-15">
-                                    <a class="l-f-o__create-link btn--e-transparent-brand-b-2" href="{{ url('/user/register') }}">CREATE AN ACCOUNT</a></div>
+                                    <a class="l-f-o__create-link btn--e-transparent-brand-b-2" href="{{ url('/user/register') }}">{{ __('CREATE AN ACCOUNT') }}</a></div>
                                 <h1 class="gl-h1">{{ __('Login') }}</h1>
 
                                 <span class="gl-text u-s-m-b-30">{{ __('If you have an account with us, please log in.') }}</span>
@@ -41,7 +41,15 @@
                                   {{ $message }}
                                 </div>
                                 @enderror
-                                <form action="{{ route('login') }}" method="POST" class="l-f-o__form basicform">
+                                @if(session('error'))
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                  {{session('error')}}
+                                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            @endif
+                                <form action="{{ url('/customer/login') }}" method="POST" class="l-f-o__form basicform">
                                     @csrf
                                     <div class="u-s-m-b-30">
 
@@ -60,7 +68,7 @@
                                             <button class="btn btn--e-transparent-brand-b-2 basicbtn" type="submit">{{ __('Login') }}</button></div>
                                         <div class="u-s-m-b-30">
 
-                                            <a class="gl-link" href="{{ url('/password/reset') }}">{{ __('Lost Your Password?') }}</a></div>
+                                            <a class="gl-link" href="{{ url('/user/password/reset') }}">{{ __('Lost Your Password?') }}</a></div>
                                     </div>
                                     <div class="u-s-m-b-30">
 
