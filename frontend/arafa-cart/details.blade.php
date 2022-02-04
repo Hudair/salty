@@ -176,7 +176,7 @@
                                             <div class="pd-detail__size">
                                                  @foreach ($option->childrenCategories as $row)
                                                  <div class="@if($option->select_type == 1) size__checkbox @else size__radio @endif">
-                                                    <input  data-amount="{{ $row->amount }}" data-amounttype="{{ $row->amount_type }}"  @if($option->select_type == 1) type="checkbox" @else type="radio" @endif name="option[]" value="{{ $row->id }}" class="selectgroup-input option options @if($option->is_required == 1) req @endif" id="option{{ $row->id }}">
+                                                    <input  data-amount="{{ $row->amount }}" data-amounttype="{{ $row->amount_type }}"  @if($option->select_type == 1) type="checkbox" name="option[]" @else name="option[{{ $key }}]" type="radio" @endif  value="{{ $row->id }}" class="selectgroup-input option options @if($option->is_required == 1) req @endif" id="option{{ $row->id }}">
                                                     <label class="size__radio-label option option{{ $row->id }}" for="option{{ $row->id }}">{{ $row->name }}</label>
                                                   </div>  
                                                   @endforeach                                             
@@ -396,19 +396,19 @@
                <div>
                   <p class="u-s-m-b-30">
                      <label class="gl-label" for="reviewer-name">{{ __('Name') }} *</label>
-                     <input class="input-text input-text--primary-style" type="text" id="reviewer-name" value="{{ Auth::user()->name ?? '' }}" name="name" placeholder="Your name" required readonly>
+                     <input class="input-text input-text--primary-style" type="text" id="reviewer-name" value="{{ Auth::guard('customer')->user()->name ?? '' }}" name="name" placeholder="Your name" required readonly>
                   </p>
                   <p class="u-s-m-b-30">
                      <label class="gl-label" for="reviewer-email">{{ __('Email') }} *</label>
-                     <input class="input-text input-text--primary-style" type="email" id="reviewer-email" name="email" placeholder="Your email" required readonly value="{{ Auth::user()->email ?? '' }}">
+                     <input class="input-text input-text--primary-style" type="email" id="reviewer-email" name="email" placeholder="Your email" required readonly value="{{ Auth::guard('customer')->user()->email ?? '' }}">
                   </p>
                </div>
             </div>
             <div>
-            	@if(Auth::check())
+            	@if(Auth::guard('customer')->check())
                <button class="btn btn--e-brand-shadow review_btn" type="submit"><i class="fas fa-paper-plane"></i> {{ __('Send Review') }}</button>
                @else
-               <a href="{{ url('/customer/login') }}" class="btn btn--e-brand-shadow review_btn">
+               <a href="{{ url('/user/login') }}" class="btn btn--e-brand-shadow review_btn">
                	<i class="fas fa-sign-in-alt"></i>
                	{{ __('Please Login') }}
                </a>

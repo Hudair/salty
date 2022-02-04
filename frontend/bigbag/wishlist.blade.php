@@ -33,7 +33,7 @@
 						</thead>
 
 						<tbody>
-							@foreach(\Cart::instance('wishlist')->content() as $row)	
+							@foreach(Cart::instance('wishlist')->content() as $row)	
                                 <tr>
                                     <td>
                                         <a class="text-danger" href="{{ url('/wishlist/remove',$row->rowId) }}">×</a></td>

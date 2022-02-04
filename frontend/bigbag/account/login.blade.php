@@ -34,15 +34,23 @@
   <div class="form-box">
     <h2>{{ __('Login') }}</h2>
     <p>{{ __('Welcome back! please login to your account.') }}</p>
-    <form action="{{ route('login') }}" method="POST" class="mt-3 basicform">
+    @if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{session('error')}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    @endif
+    <form action="{{ url('/customer/login') }}" method="POST" class="mt-3 basicform">
       @csrf
       <fieldset class="form-group mb-3">
         <input type="email" placeholder="Email"  class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required="">
-        @error('email')
+        @if($errors->has('email'))
         <div class="invalid-feedback">
-          {{ $message }}
+          {{ $errors->first('email') }}
         </div>
-        @enderror
+        @endif
       </fieldset>
       <fieldset class="form-group mb-3">
         <input type="password" placeholder="Password" name="password" class="form-control" required="">
@@ -55,7 +63,7 @@
           </div>
         </div>
         <div class="col-6">
-          <p class="mb-0"><a href="{{ url('/password/reset') }}" class="base_color">{{ __('Forgot Password') }}</a></p>
+          <p class="mb-0"><a href="{{ url('/user/password/reset') }}" class="base_color">{{ __('Forgot Password') }}</a></p>
         </div>
       </div>
       <div class="row mt-4">

@@ -33,7 +33,7 @@
                  
                   <div id="checkout-msg-group">
                      @if(env('MULTILEVEL_CUSTOMER_REGISTER') == true)
-                      @if(!Auth::check())
+                      @if(!Auth::guard('customer')->check())
                      <div class="msg u-s-m-b-30">
                         <span class="msg__text">{{ __('Returning customer?') }}
                         <a class="gl-link" href="#return-customer" data-toggle="collapse">{{ __('Click here to login') }}</a></span>
@@ -45,7 +45,7 @@
                         <div class="collapse" id="return-customer" data-parent="#checkout-msg-group">
                            <div class="l-f u-s-m-b-16">
                               <span class="gl-text u-s-m-b-16">{{ __('If you have an account with us, please log in.') }}</span>
-                              <form class="l-f__form" action="{{ route('login') }}" method="post">
+                              <form class="l-f__form" action="{{ url('/customer/login') }}" method="post">
                                  @csrf
                                  <div class="gl-inline">
                                     <div class="u-s-m-b-15">
@@ -63,7 +63,7 @@
                                        <button class="btn btn--e-transparent-brand-b-2" type="submit">{{ __('Login') }}</button>
                                     </div>
                                     <div class="u-s-m-b-15">
-                                       <a class="gl-link" href="{{ url('/password/reset') }}">{{ __('Lost Your Password?') }}</a>
+                                       <a class="gl-link" href="{{ url('/user/password/reset') }}">{{ __('Lost Your Password?') }}</a>
                                     </div>
                                  </div>
                                  <!--====== Check Box ======-->
@@ -135,7 +135,7 @@
                               <div class="u-s-m-b-15">
                                  <label class="gl-label" for="billing-fname">{{ __('Full Name') }}*</label>
                                  
-                                 <input type="text" placeholder="Full Name" name="name" class="input-text input-text--primary-style" required="" value="{{ Auth::user()->name  ?? '' }}">
+                                 <input type="text" placeholder="Full Name" name="name" class="input-text input-text--primary-style" required="" value="{{ Auth::guard('customer')->user()->name  ?? '' }}">
 						
                               </div>
                              
@@ -145,7 +145,7 @@
                            <div class="u-s-m-b-15">
                               <label class="gl-label" for="billing-email">{{ __('E-mail') }} *</label>
                               
-                              <input type="email" placeholder="Email Address" name="email" class="input-text input-text--primary-style" required="" value="{{ Auth::user()->email ?? '' }}">
+                              <input type="email" placeholder="Email Address" name="email" class="input-text input-text--primary-style" required="" value="{{ Auth::guard('customer')->user()->email ?? '' }}">
 						
                            </div>
                            <!--====== End - E-MAIL ======-->
@@ -186,8 +186,8 @@
                            <!--====== End - Country ======-->
                           
                           
-                          @if(env('MULTILEVEL_CUSTOMER_REGISTER') == true)
-                          @guest                        
+                          @if(env('MULTILEVEL_CUSTOMER_REGISTER') == true && !Auth::guard('customer')->check())
+                                             
                            <div class="u-s-m-b-10">
                               <div class="check-box">
                                  <input type="checkbox" id="make-default-address" name="create_account" value="1" class="create_account" data-bill="">
@@ -204,7 +204,7 @@
                                  <input class="input-text input-text--primary-style" type="password" name="password" data-bill id="reg-password">
                               </div>
                            </div>
-                          @endguest
+                          
                           @endif
                            <div class="u-s-m-b-10">
                               <label class="gl-label" for="order-note">{{ __('Order Note :') }}</label><textarea class="text-area text-area--primary-style" name="comment" id="order-note"></textarea>

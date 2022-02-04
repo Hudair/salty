@@ -18,11 +18,8 @@
 		</div>
 	</div>
 </section>
-
-
-
 <form action="{{ url('/make_order') }}" class="checkout_form" method="post">
-						@csrf
+@csrf
 <div class="section">
 	<div class="container">
 
@@ -30,7 +27,7 @@
 			<div class="row">
 				<div class="col-xl-7">
 					 @if(env('MULTILEVEL_CUSTOMER_REGISTER') == true)
-					@if(!Auth::check())
+					@if(!Auth::guard('customer')->check())
 					<!-- Login -->
 					<div class="bigbag_notice">
 						<p>{{ __('Are you a returning customer?') }} <a href="{{ url('/user/login') }}">{{ __('Click here to login') }}</a> </p>
@@ -73,18 +70,18 @@
 					<div class="row">
 						<div class="form-group col-xl-12">
 							<label>{{ __('Name') }} <span class="text-danger">*</span></label>
-							<input type="text" placeholder="Full Name" name="name" class="form-control" required="" value="{{ Auth::user()->name  ?? '' }}">
+							<input type="text" placeholder="Full Name" name="name" class="form-control" required="" value="{{ Auth::guard('customer')->user()->name  ?? '' }}">
 						</div>
 						<div class="form-group col-xl-6">
 							<label>{{ __('Email Address') }} <span class="text-danger">*</span></label>
-							<input type="email" placeholder="Email Address" name="email" class="form-control" required="" value="{{ Auth::user()->email ?? '' }}">
+							<input type="email" placeholder="Email Address" name="email" class="form-control" required="" value="{{ Auth::guard('customer')->user()->email ?? '' }}">
 						</div>
 						<div class="form-group col-xl-6">
 							<label>{{ __('Phone Number') }} <span class="text-danger">*</span></label>
 							<input type="text" placeholder="Phone Number" name="phone" class="form-control" value="" required="">
 						</div>
 						@if(env('MULTILEVEL_CUSTOMER_REGISTER') == true)
-						@if(!Auth::check())
+						@if(!Auth::guard('customer')->check())
 						<div class="form-group col-xl-12">
 							<label><input type="checkbox"  name="create_account" value="1" class="create_account">{{ __('With Create Account') }}</label>
 						</div>
@@ -217,11 +214,9 @@
 				@if(Cart::count() > 0)
 				<button type="submit" class="bigbag_btn-custom primary btn-block mt-2 checkout_submit_btn">{{ __('Place Order') }}</button>
 				@endif
-				<!-- Order Details End -->
-				
+				<!-- Order Details End -->				
 			</div>
-		</div>
-	
+		</div>	
 </div>
 </div> 
 </form>
