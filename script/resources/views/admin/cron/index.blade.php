@@ -13,7 +13,7 @@
 				
 			</div>
 			<div class="card-body">
-				<div class="code"><p>curl -s {{ url('/cron_job/make_expirable_user') }}</p></div>
+				<div class="code"><p>curl -s {{ url('/cron/make-expire-order') }}</p></div>
 			</div>
 		</div>
 	</div>
@@ -24,7 +24,7 @@
 				<h4><i class="fas fa-circle"></i> {{ __('Membership Will Expiration Alert') }} <code>{{ __('Once/day') }}</code></h4>
 			</div>
 			<div class="card-body">
-				<div class="code"><p>curl -s {{ url('/cron_job/send_mail_to_will_expire_plan_soon') }}</p></div>
+				<div class="code"><p>curl -s {{ url('/cron/make-alert-before-expire-plan') }}</p></div>
 			</div>
 		</div>
 	</div>
@@ -34,7 +34,7 @@
 				<h4><i class="fas fa-circle"></i> {{ __('Reset Offer Product Price') }} <code>{{ __('Once/day') }}</code></h4>
 			</div>
 			<div class="card-body">
-				<div class="code"><p>curl -s {{ url('/cron_job/reset_product_price') }}</p></div>
+				<div class="code"><p>curl -s {{ url('/cron/reset_product_price') }}</p></div>
 			</div>
 		</div>
 	</div>
@@ -65,16 +65,7 @@
 			
 			<div class="card-body">
 				<div class="row">
-					<div class="col-sm-6">
-						<div class="form-group">
-							<label>{{ __('Alert Mail When Subscription Will Expired') }}</label>
-
-							<select class="form-control mt-4" name="send_notification_expired_date">
-								<option value="yes" @if($info->send_notification_expired_date == 'yes') selected="" @endif>{{ __('Yes') }}</option>
-								<option value="no" @if($info->send_notification_expired_date == 'no') selected="" @endif>{{ __('No') }}</option>
-							</select>
-						</div>
-					</div>
+					
 					
 
 					<div class="col-sm-6">
@@ -93,16 +84,7 @@
 							</select>
 						</div>
 					</div>
-					<div class="col-sm-6">
-						<div class="form-group">
-							<label>{{ __('Auto Assign To Default Plan After Subscription Will Expire') }}</label>
-
-							<select class="form-control mt-4" name="auto_assign_to_default">
-								<option value="yes" @if($info->auto_assign_to_default == 'yes') selected="" @endif>{{ __('Yes') }}</option>
-								<option value="no" @if($info->auto_assign_to_default == 'no') selected="" @endif>{{ __('No') }}</option>
-							</select>
-						</div>
-					</div>
+				
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label>{{ __('Auto Approve To Plan After Successfull Payment') }}</label>
@@ -114,6 +96,30 @@
 						</div>
 					</div>
 					<div class="col-sm-6">
+						<div class="form-group">
+							<label>{{ __('Alert Message Before Expire The Subscription') }} <small>(HTML supported)</small></label>
+
+							<textarea name="alert_message" class="form-control">{{ $info->alert_message }}</textarea>
+
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label>{{ __('Alert Message After Expire The Subscription') }} <small>(HTML supported)</small></label>
+
+							<textarea name="expire_message" class="form-control">{{ $info->expire_message }}</textarea>
+
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label>{{ __('Alert Message After Expire The Trial Subscription') }} <small>(HTML supported)</small></label>
+
+							<textarea name="trial_expired_message" class="form-control">{{ $info->trial_expired_message }}</textarea>
+
+						</div>
+					</div>
+					<div class="col-sm-12">
 						<button class="btn btn-primary basicbtn" type="submit">{{ __('Save Changes') }}</button>
 					</div>
 					</form>	

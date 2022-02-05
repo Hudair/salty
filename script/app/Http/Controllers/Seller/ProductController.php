@@ -18,6 +18,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Price;
 use App\Models\Termoption;
 use App\Models\Termoptionvalue;
+use Carbon\Carbon;
 use DB;
 class ProductController extends Controller
 {
@@ -78,12 +79,16 @@ class ProductController extends Controller
           'title' => 'required|max:100',
           'price' => 'required|max:50',
         ]);
-
+        if ($request->affiliate) {
+            $request->validate([
+              'purchase_link' => 'required|max:100'
+            ]);
+        }
         $slug=Str::slug($request->title);
 
        
 
-        if($request->special_price_start <= date('Y-m-d') && $request->special_price != null){
+        if($request->special_price_start <=  Carbon::now()->format('Y-m-d') && $request->special_price != null){
          if($request->special_price != null){
             if($request->price_type == 1){
                 $price=$request->price-$request->special_price;
@@ -137,6 +142,19 @@ class ProductController extends Controller
         $dta['content']=null;
         $dta['excerpt']=null;
 
+        $meta=new Meta;
+        $meta->term_id = $term->id;  
+        $meta->key = 'content';  
+        $meta->value = json_encode($dta); 
+        $meta->save(); 
+
+        if ($request->affiliate) {
+            $meta=new Meta;
+            $meta->term_id = $term->id;  
+            $meta->key = 'affiliate';  
+            $meta->value = $request->purchase_link; 
+            $meta->save(); 
+        }
         $meta=new Meta;
         $meta->term_id = $term->id;  
         $meta->key = 'content';  
@@ -235,7 +253,7 @@ class ProductController extends Controller
     public function edit($id,$type="edit")
     {
         if ($type=='edit') {
-            $info=Term::with('content','post_categories')->where('user_id',Auth::id())->findorFail($id);
+             $info=Term::with('content','post_categories','affiliate')->where('user_id',Auth::id())->findorFail($id);
 
             $cats=[];
 
@@ -391,9 +409,15 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if ($request->affiliate) {
+            $request->validate([
+              'purchase_link' => 'required|max:100'
+            ]);
+        }
        
-
-       $info=Term::where('user_id',Auth::id())->findorFail($id);
+        DB::beginTransaction();
+        try {
+       $info=Term::where('user_id',Auth::id())->with('affiliate')->findorFail($id);
        $info->title=$request->title;
        $info->slug=$request->slug;
        $info->featured=$request->featured;
@@ -404,7 +428,7 @@ class ProductController extends Controller
        if (empty($meta)) {
            $meta=new Meta;
            $meta->term_id=$id;
-           $meta->type='content';
+           $meta->key='content';
        }
        $dta['content']=$request->content;
        $dta['excerpt']=$request->excerpt;
@@ -433,6 +457,30 @@ class ProductController extends Controller
        if (count($catsArr) > 0) {
           Postcategory::insert($catsArr);
        }
+
+        if ($request->affiliate) {
+            $meta=Meta::where('key','affiliate')->where('term_id',$id)->first();
+            if (empty($meta)) {
+               $meta=new Meta;
+               $meta->term_id=$id;
+               $meta->key='affiliate';
+            }
+            $meta->value = $request->purchase_link; 
+            $meta->save(); 
+        }
+        else{
+          if (!empty($info->affiliate)) {
+           Meta::where('key','affiliate')->where('term_id',$id)->delete();
+          }
+
+        }
+         DB::commit();
+        
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return back();
+        }
        
        return response()->json(['Item Updated']);
 
@@ -440,7 +488,7 @@ class ProductController extends Controller
 
    public function price(Request $request, $id){
        
-    if($request->special_price_start <= date('Y-m-d') && $request->special_price != null){
+    if($request->special_price_start <= Carbon::now()->format('Y-m-d') && $request->special_price != null){
        if($request->special_price != null){
         if($request->price_type == 1){
             $price=$request->price-$request->special_price;
@@ -484,7 +532,7 @@ class ProductController extends Controller
        if (empty($meta)) {
            $meta=new Meta;
            $meta->term_id=$id;
-           $meta->type='seo';
+           $meta->key='seo';
        }
        $data['meta_title']=$request->meta_title;
        $data['meta_description']=$request->meta_description;

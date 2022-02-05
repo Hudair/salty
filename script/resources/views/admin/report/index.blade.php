@@ -27,6 +27,7 @@
 				</div>
 				<div class="card-body">
 					{{ amount_format($order_sum) }}
+
 				</div>
 			</div>
 		</div>
@@ -34,14 +35,14 @@
 	<div class="col-lg-3 col-md-6 col-sm-6 col-12">
 		<div class="card card-statistic-1">
 			<div class="card-icon bg-warning">
-				<i class="far fa-clock"></i>
+				<i class="fas fa-wallet"></i>
 			</div>
 			<div class="card-wrap">
 				<div class="card-header">
-					<h4>{{ __('Total Pendings') }}</h4>
+					<h4>{{ __('Total Tax') }}</h4>
 				</div>
 				<div class="card-body">
-					{{ number_format($order_pending) }}
+					{{ amount_format($order_tax) }}
 				</div>
 			</div>
 		</div>
@@ -101,14 +102,17 @@
 							<td>{{ $row->created_at->format('d-F-Y') }}</td>
 							
 							<td>{{ amount_format($row->amount) }}</td>
-							<td>{{ $row->payment_method->method->name ?? '' }}</td>
-							<td>@if(!empty($row->payment_method))
-								@if($row->payment_method->status==1)
+							<td>{{ $row->category->name ?? '' }}</td>
+							<td>
+								@if($row->payment_status==1)
 								<span class="badge badge-success">{{ __('Paid') }}</span>
+								
+								@elseif($row->payment_status==2)
+								<span class="badge badge-warning">{{ __('Pending') }}</span>
 								@else
 								<span class="badge badge-danger">{{ __('Fail') }}</span>
 								@endif
-								@endif
+								
 							</td>
 
 							<td>

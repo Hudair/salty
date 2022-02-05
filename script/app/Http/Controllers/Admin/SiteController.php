@@ -24,11 +24,12 @@ class SiteController extends Controller
     	$order_prefix=Option::where('key','order_prefix')->first();
         $currency_info=Option::where('key','currency_info')->first();
     	$auto_order=Option::where('key','auto_order')->first();
+        $tax=Option::where('key','tax')->first();
         
          
         $currency_info=json_decode($currency_info->value ?? '');
        
-    	return view('admin.settings.site_settings',compact('info','currency_name','currency_icon','order_prefix','currency_info','auto_order'));
+    	return view('admin.settings.site_settings',compact('info','currency_name','currency_icon','order_prefix','currency_info','auto_order','tax'));
     }
 
     public function site_settings_update(Request $request)
@@ -88,6 +89,14 @@ class SiteController extends Controller
         $auto_order->value=$request->auto_order;
         $auto_order->save();
 
+        $tax=Option::where('key','tax')->first();
+        if (empty($tax)) {
+            $tax=new Option;
+            $tax->key="tax";
+        }
+        $tax->value=$request->tax;
+        $tax->save();
+
 
 
     	if ($request->logo) {
@@ -130,6 +139,8 @@ class SiteController extends Controller
 $txt ="APP_NAME=".$APP_NAME."
 APP_ENV=".$request->APP_ENV."
 APP_KEY=".$request->APP_KEY."
+SITE_KEY=".env('SITE_KEY')."
+AUTHORIZED_KEY=".env('AUTHORIZED_KEY')."
 APP_DEBUG=".$request->APP_DEBUG."
 APP_URL=".$request->APP_URL."
 APP_URL_WITHOUT_WWW=".$APP_URL_WITHOUT_WWW."
@@ -172,10 +183,21 @@ DO_SPACES_BUCKET=".$request->DO_SPACES_BUCKET."\n
 NOCAPTCHA_SECRET=".$request->NOCAPTCHA_SECRET."
 NOCAPTCHA_SITEKEY=".$request->NOCAPTCHA_SITEKEY."
 
+AUTO_APPROVED_DOMAIN=".$request->AUTO_APPROVED_DOMAIN."
+MOJODNS_AUTHORIZATION_TOKEN=".$request->MOJODNS_AUTHORIZATION_TOKEN."
+SERVER_IP=".$request->SERVER_IP."
+CNAME_DOMAIN=".$request->CNAME_DOMAIN."
+VERIFY_IP=".$request->VERIFY_IP."
+VERIFY_CNAME=".$request->VERIFY_CNAME."
+
 TIMEZONE=".$request->TIMEZONE.""."
 DEFAULT_LANG=".$request->DEFAULT_LANG."\n
 ";
-       File::put(base_path('.env'),$txt);
+File::put(base_path('.env'),$txt);
+
+
+
+     
        return response()->json(['System Updated']);
 
 

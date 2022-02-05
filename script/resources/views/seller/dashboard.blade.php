@@ -7,13 +7,16 @@
     <div class="card">
       <div class="card-body">
         <p>
-          {{ __('Dear,') }} <b>{{ Auth::user()->name }}</b>{{ __(' Your Account Currently') }} <b class="text-danger"> @if(Auth::user()->status == 2) {{ __('Suspened') }} @elseif(Auth::user()->status == 3) {{ __('Pending') }} @endif </b> {{ __('Mode And Also Disabled All Functionality If You Are Not Complete Your Payment Please Complete Your Payment From') }} <a href="{{ route('merchant.plan') }}">{{ __('Here') }}</a> {{ __('Or Also Contact With Support Team') }}
+          {{ __('Dear,') }} <b>{{ Auth::user()->name }}</b>{{ __(' Your Account Currently') }} <b class="text-danger"> @if(Auth::user()->status == 2) {{ __('Suspened') }} @elseif(Auth::user()->status == 3) {{ __('Pending') }} @endif </b> {{ __('Mode And Also Disabled All Functionality If You Are Not Complete Your Payment Please Complete Your Payment From') }} @if(Route::has('merchant.plan')) <a href="{{ route('merchant.plan') }}">{{ __('Here') }}</a> @endif {{ __('Or Also Contact With Support Team') }}
         </p> 
       </div>
     </div>
   </div>
 </div>
 @endif
+@php
+$plan=user_limit();
+@endphp
 <div class="row">
   <div class="col-lg-4 col-md-4 col-sm-12">
     <div class="card card-statistic-2">
@@ -107,6 +110,20 @@
 </div>
 
 <div class="row">
+  @php
+   $date= \Carbon\Carbon::now()->addDays(7)->format('Y-m-d');
+  @endphp
+  @if(Auth::user()->user_domain->will_expire <= $date)
+  <div class="col-sm-12">
+      <div class="col-md-12">
+        <div class="alert alert-warning">
+            {{  __('Your subscription is ending in')  }} {{ \Carbon\Carbon::parse(Auth::user()->user_domain->will_expire)->diffForHumans() }}
+            {{ __('Please') }} <ins><a class="text" href="{{  Auth::user()->user_domain->is_trial == 1 ? url('/seller/settings/plan') :  url('/seller/plan-renew') }}">{{ Auth::user()->user_domain->is_trial == 1 ? __('Enroll in a plan!') : __('Renew the plan') }}</a></ins> 
+        </div>
+    </div>
+  </div>
+  @endif
+  
     <div class="col-12 col-xl-9">
 
         <div class="row">
@@ -225,72 +242,10 @@
             </div>
         </div>
     </div>
-</div>
-</div>
-<div class="col-12 col-xl-3">
-    <div class="row">
-        <div class="col-12">
-            <div class="card mt-4">
-                <div class="card-header">
 
-                    <h4 class="card-header-title plan_name" ></h4>
-
-                    <span class="badge badge-soft-secondary plan_expire"></span>
-                    <img src="{{ asset('uploads/loader.gif') }}"  class="plan_load">
-                </div>
-                <div class="card-header">
-
-                    <h4 class="card-header-title">{{ __('Storage usage') }}</h4>
-
-                    <span class="badge badge-soft-secondary" id="storage_used"><img src="{{ asset('uploads/loader.gif') }}"  class="storrage_used"></span>
-                </div>
-                <div class="card-header">
-
-                    <h4 class="card-header-title">{{ __('Products') }}</h4>
-
-                    <span class="badge badge-soft-secondary posts_used"><img src="{{ asset('uploads/loader.gif') }}"  class="product_used"></span>
-                </div>
-                 <div class="card-header">
-
-                    <h4 class="card-header-title">{{ __('Pages') }}</h4>
-
-                    <span class="badge badge-soft-secondary pages"> <img src="{{ asset('uploads/loader.gif') }}"  class="product_used"></span>
-                </div>
-               
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-
-                    <h4 class="card-header-title">{{ __('Products Limit') }} <span><span class="text-danger posts_created"></span>/<span class="product_capacity"> </span></span></h4>
-                </div>
-                <div class="card-body">
-
-                    <div class="sparkline-pie-product d-inline"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-
-                    <h4 class="card-header-title">{{ __('Storage Uses') }} <span><span class="text-danger storage_used"></span>/<span class="storage_capacity"> </span></span></h4>
-                </div>
-                <div class="card-body">
-
-                     <div class="sparkline-pie-storage d-inline"></div>
-                   
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-12 col-sm-12">
-    <div class="card">
+ @if(filter_var($plan['qr_code']) == true && filter_var($plan['google_analytics']) == true)
+    <div class="col-12">
+        <div class="card">
       <div class="card-header">
         <h4>{{ __('Site Analytics') }}</h4>
         <div class="card-header-action">
@@ -332,6 +287,134 @@
         </div>
       </div>
     </div>
+    </div>
+@endif
+</div>
+</div>
+<div class="col-12 col-xl-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mt-4">
+                <div class="card-header">
+
+                    <h4 class="card-header-title plan_name" ></h4>
+
+                    <span class="badge badge-soft-secondary plan_expire"></span>
+                    <img src="{{ asset('uploads/loader.gif') }}"  class="plan_load">
+                </div>
+                <div class="card-header">
+
+                    <h4 class="card-header-title">{{ __('Storage usage') }}</h4>
+
+                    <span class="badge badge-soft-secondary" id="storage_used"><img src="{{ asset('uploads/loader.gif') }}"  class="storrage_used"></span>
+                </div>
+                <div class="card-header">
+
+                    <h4 class="card-header-title">{{ __('Products') }}</h4>
+
+                    <span class="badge badge-soft-secondary posts_used"><img src="{{ asset('uploads/loader.gif') }}"  class="product_used"></span>
+                </div>
+                 <div class="card-header">
+
+                    <h4 class="card-header-title">{{ __('Pages') }}</h4>
+
+                    <span class="badge badge-soft-secondary pages"> <img src="{{ asset('uploads/loader.gif') }}"  class="product_used"></span>
+                </div>
+               
+            </div>
+
+            @if(Auth::user()->status == 1)
+           
+            @if(filter_var($plan['qr_code']) == true)
+              <div class="card">
+                <div class="card-header">
+
+                    <h4 class="card-header-title">{{ __('Scan your site') }}</h4>
+                </div>
+                <div class="card-body qr-code-main">
+
+                    {!! QrCode::size(200)->generate(url('/')) !!}
+                </div>
+                <div class="card-footer">
+                  <button class="btn btn-primary col-12" onclick="downloadPng()" type="button">{{ __('Download') }}</button>
+                 </div> 
+            </div>
+            @endif
+            @endif
+            <div class="card">
+                <div class="card-header">
+
+                    <h4 class="card-header-title">{{ __('Products Limit') }} <span><span class="text-danger posts_created"></span>/<span class="product_capacity"> </span></span></h4>
+                </div>
+                <div class="card-body">
+                    <div class="sparkline-pie-product d-inline"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+
+                    <h4 class="card-header-title">{{ __('Storage Uses') }} <span><span class="text-danger storage_used"></span>/<span class="storage_capacity"> </span></span></h4>
+                </div>
+                <div class="card-body">
+
+                     <div class="sparkline-pie-storage d-inline" height="50"></div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@if(filter_var($plan['google_analytics']) == true)
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-12 col-sm-12">
+     <div class="col-12">
+        <div class="card">
+      <div class="card-header">
+        <h4>{{ __('Site Analytics') }}</h4>
+        <div class="card-header-action">
+          <select class="form-control" id="days"> 
+            <option value="7">{{ __('Last 7 Days') }}</option>
+            <option value="15">{{ __('Last 15 Days') }}</option>
+            <option value="30">{{ __('Last 30 Days') }}</option>
+            <option value="180">{{ __('Last 180 Days') }}</option>
+            <option value="365">{{ __('Last 365 Days') }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body">
+        <canvas id="google_analytics" height="80"></canvas>
+        <div class="statistic-details mt-sm-4">
+          <div class="statistic-details-item">
+
+            <div class="detail-value" id="total_visitors"></div>
+            <div class="detail-name">{{ __('Total Vistors') }}</div>
+          </div>
+          <div class="statistic-details-item">
+
+            <div class="detail-value" id="total_page_views"></div>
+            <div class="detail-name">{{ __('Total Page Views') }}</div>
+          </div>
+
+          <div class="statistic-details-item">
+
+            <div class="detail-value" id="new_vistors"></div>
+            <div class="detail-name">{{ __('New Visitor') }}</div>
+          </div>
+
+          <div class="statistic-details-item">
+
+            <div class="detail-value" id="returning_visitor"></div>
+            <div class="detail-name">{{ __('Returning Visitor') }}</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    </div>
 
     <div class="row">
       <div class="col-lg-6 col-md-6 col-12">
@@ -369,6 +452,7 @@
   </div>
 </div>
 </div>
+@endif
 <input type="hidden" id="base_url" value="{{ url('/') }}">
 <input type="hidden" id="site_url" value="{{ url('/') }}">
 <input type="hidden" id="dashboard_static" value="{{ route('seller.dashboard.static') }}">
@@ -381,4 +465,37 @@
 <script src="{{ asset('assets/js/chart.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.sparkline.min.js') }}"></script>
 <script src="{{ asset('assets/seller/dashboard.js') }}"></script>
+@if(Auth::user()->status == 1)
+           
+@if(filter_var($plan['qr_code']) == true)
+<script type="text/javascript">
+"use strict";
+
+  function downloadPng() {
+    var img = new Image();
+    img.onload = function() {
+        var canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        var ctxt = canvas.getContext("2d");
+        ctxt.fillStyle = "#fff";
+        ctxt.fillRect(0, 0, canvas.width, canvas.height);
+        ctxt.drawImage(img, 0, 0);
+        var a = document.createElement("a");
+        a.href = canvas.toDataURL("image/png");
+        a.download = "qrcode.png"
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+    var innerSvg = document.querySelector(".qr-code-main svg");
+    var svgText = (new XMLSerializer()).serializeToString(innerSvg);
+    img.src = "data:image/svg+xml;utf8," + encodeURIComponent(svgText);
+} {
+    // "mode"=> "full",
+    // "isActive": false
+}
+</script>
+@endif
+@endif
 @endpush

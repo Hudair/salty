@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Category;
 use App\Categorymeta;
 use Auth;
+use Route;
 class PaymentController extends Controller
 {
     /**
@@ -145,14 +146,8 @@ class PaymentController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function __construct()
     {
-        //
+        abort_if(!Route::has('admin.payment-geteway.index'),404);
     }
 }

@@ -45,11 +45,7 @@ class CouponController extends Controller
          return response()->json($error,401);
         }
 
-         if ($limit['storage_limit'] <= str_replace(',', '', folderSize('uploads/'.Auth::id()))) {
-         \Session::flash('error', 'Maximum storage limit exceeded');
-         $error['errors']['error']='Maximum storage limit exceeded';
-         return response()->json($error,401);
-        }
+        
         
        $validatedData = $request->validate([
         'coupon_code' => 'required|max:50',

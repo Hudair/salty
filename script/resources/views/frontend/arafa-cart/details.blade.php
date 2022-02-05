@@ -186,7 +186,7 @@
                                         </div>
                                           <p class="text-danger none required_option">{{ __('Please Select A Option From Required Field') }}</p>
                                         <div class="pd-detail-inline-2">
-
+                                          @if(empty($info->affiliate))
                                             <div class="u-s-m-b-15">
 
                                                 <!--====== Input Counter ======-->
@@ -201,7 +201,13 @@
                                             </div>
                                             <div class="u-s-m-b-15">
                                                 <button class="btn btn--e-brand-b-2 submit_btn"  @if($info->stock->stock_status == 0) disabled @endif type="submit">@if($info->stock->stock_status == 0) <del>{{ __('Out Of Stock') }}</del> @else {{ __('Add to Cart') }} @endif</button>
-                                              </div>
+                                            </div>
+                                            @else
+                                            <div class="u-s-m-b-15">
+                                                <a href="{{ url($info->affiliate->value ?? '') }}" target="_blank"  class="btn btn--e-brand-b-2"  @if($info->stock->stock_status == 0) disabled @endif type="submit">@if($info->stock->stock_status == 0) <del>{{ __('Out Of Stock') }}</del> @else {{ __('Purchase Now') }} @endif</a>
+                                            </div>
+
+                                            @endif
                                         </div>
                                     </form>
                                 </div>

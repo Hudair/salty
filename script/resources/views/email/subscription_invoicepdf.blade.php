@@ -160,32 +160,32 @@
                         
                         <td>Purchased At: {{ $info->created_at->format('Y-m-d') }}<br></td>
 
-                        <td>Expiry Date: {{ $info->created_at->format('Y-m-d') }}<br></td>
+                        <td>Expiry Date: {{ $info->will_expire }}<br></td>
                     </tr>
                     <tr>
                         <td>
                             Payment Status: <br>
-                            @if(!empty($info->trasection_id))
+                            
 
-                            @if($info->payment_method->status==2)
+                            @if($info->payment_status==2)
                             <div class="badge">Pending</div>
-                            @elseif($info->payment_method->status==1)
+                            @elseif($info->payment_status==1)
                             <div class="badge">Paid</div>
-                            @elseif($info->payment_method->status==0)
+                            @elseif($info->payment_status==0)
                             <div class="badge">Cancel</div>
-                            @elseif($info->payment_method->status==3)
+                            @elseif($info->payment_status==3)
                             <div class="badge">Incomplete</div>
                             @endif
 
-                            @endif
+                            
 
                         </td>
 
                         <td>
                             Payment Mode <br>
-                             @if(!empty($info->trasection_id))
-                            {{ $info->payment_method->method->name }} 
-                            @endif
+                            
+                            {{ $info->category->name }} 
+                            
                         </td>
                     </tr>
                 </table>
@@ -195,15 +195,23 @@
         <table class="item">
             <tbody>
                 <tr class="heading">
-                    <td class="text-left">Description</td>
-                    <td class="text-right">Total</td>
+                    <td class="text-left">Name</td>
+                    <td class="text-right">Description</td>
                 </tr>
                 @if(!empty($info->plan_info))
                 <tr>
-                    <td class="text-left">{{ $info->plan_info->name }}</td>
-                    <td class="text-right">{{ amount_format($info->amount) }}</td>
+                    <td class="text-left">Plan Name</td>
+                    <td class="text-right">{{ $info->plan_info->name }}</td>
                 </tr>
                 @endif
+                <tr>
+                    <td class="text-left">Amount</td>
+                    <td class="text-right">{{ number_format($info->amount,2) }}</td>
+                </tr>
+                <tr>
+                    <td class="text-left">Tax</td>
+                    <td class="text-right">{{ number_format($info->tax,2) }}</td>
+                </tr>
                 <tr class="subtotal">
                     
                     
@@ -218,7 +226,7 @@
                     
                     
                     <td class="text-right"></td>
-                    <td class="text-right">Total: {{ amount_format($info->amount) }}</td>
+                    <td class="text-right">Total: {{ number_format($info->amount+$info->tax,2) }}</td>
                 </tr>
             </tbody>
         </table>

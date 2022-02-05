@@ -76,7 +76,12 @@ $info=Cache::get('site_info','');
           <div class="form-group-2 mb-4">
             <textarea name="message" id="message" class="form-control" rows="8" placeholder="Your Message" required></textarea>
           </div>
-
+          @if(env('NOCAPTCHA_SITEKEY') != null)
+          <div class="form-group">
+            {!! NoCaptcha::renderJs() !!}
+            {!! NoCaptcha::display() !!}
+          </div>
+          @endif 
           <div>
             <input class="btn btn-main btn-round-full basicbtn" name="submit" type="submit" value="Send Messege"></input>
           </div>

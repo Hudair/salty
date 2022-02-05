@@ -83,7 +83,7 @@ $currency_info=currency_info();
 <script src="{{ asset('assets/js/jquery.unveil.js') }}"></script>
 <!--====== App ======-->
 
-<script src="{{ asset('frontend/arafa-cart/js/helper.js?v=1.0') }}"></script>
+<script src="{{ asset('frontend/arafa-cart/js/helper.js?v=1.1') }}"></script>
 @stack('js')
 <script src="{{ asset('frontend/arafa-cart/js/app.js') }}"></script>
 {{ load_footer() }}

@@ -6,17 +6,17 @@
     <title>{{ __('Installer') }}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('uploads/favicon.ico') }}">
     <!-- Place favicon.ico in the root directory -->
 
-   <!-- CSS here -->
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/fontawesome-all.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/font.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/default.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/style.css') }}">
+    <!-- CSS here -->
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/font.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/default.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/style.css') }}">
 </head>
 <body class="install">
         <!--[if lte IE 9]>
@@ -31,7 +31,7 @@
             <div>
                 <h3 class="install-info"></h3>
                 <div class="back-btn d-flex justify-content-center">
-                    <a class="back btn d-none" href="{{ route('install.info') }}">Try Again</a>
+                    <a class="back btn d-none" href="{{ url('/install/info') }}">Try Again</a>
                 </div>
             </div>
         </div>
@@ -48,11 +48,11 @@
                         <p>{{ __('Please enter your database connection details') }}</p>
                     </div>
                  <div class="alert alert-success d-none" role="alert">
-                     
+
                  </div>
                  <form action="{{ url('install/store') }}" method="POST" id="install">
                     @csrf
-                      <div class="custom-form install-form">
+                    <div class="custom-form install-form">
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
@@ -113,9 +113,9 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <input type="hidden" value="{{ url('/') }}" class="form-control none" id="app_url" name="app_url" required placeholder="App Url">
-                                    <input type="hidden" id="migrate_url" value="{{ route('install.migrate') }}">
-                                    <input type="hidden" id="seed_url" value="{{ route('install.seed') }}">
-                                    <input type="hidden" id="check_url" value="{{ route('install.check') }}">
+                                    <input type="hidden" id="migrate_url" value="{{ url('/install/migrate') }}">
+                                    <input type="hidden" id="seed_url" value="{{ url('/install/seed') }}">
+                                    <input type="hidden" id="check_url" value="{{ url('/install/check') }}">
                                     <input type="hidden" id="home_url" value="{{ url('/') }}">
                                 </div>
                             </div>
@@ -128,7 +128,7 @@
         </div>
     </section>
     <!-- requirments-section-end -->
-    <script src="{{ asset('assets/installer/js/vendor/jquery-3.5.1.min.js') }}"></script>
-    <script src="{{ asset('assets/installer/js/install/install.js') }}"></script>
+    <script src="{{ asset('frontend/assets/js/installer/jquery-3.5.1.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/js/installer/install.js') }}"></script>
 </body>
 </html>

@@ -36,18 +36,7 @@ class UserTableSeeder extends Seeder
     		'password' => Hash::make('rootadmin'),
     	]);
     	
-    	// User::create([
-    	// 	'role_id' => 3,
-    	// 	'domain_id' => 1,
-    	// 	'name' => 'seller',
-    	// 	'email' => 'seller@seller.com',
-    	// 	'password' => Hash::make('rootadmin'),
-    	// ]);
-    	// Domain::create([
-    	// 	'domain'=> 'shop1.shop.test',
-    	// 	'full_domain'=> 'http://shop1.shop.test',
-    	// 	'user_id'=> 2,
-    	// ]);
+    	
     	$roleSuperAdmin = Role::create(['name' => 'superadmin']);
         //create permission
     	$permissions = [
@@ -238,7 +227,9 @@ class UserTableSeeder extends Seeder
   array('id' => '2','key' => 'order_prefix','value' => 'AMC','created_at' => '2020-12-12 14:49:38','updated_at' => '2020-12-12 14:49:38'),
   array('id' => '3','key' => 'company_info','value' => '{"name":"Dokans","site_description":"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s","email1":"email@email.com","email2":"email2@email.com","phone1":"+88012456789","phone2":"+88012456789","country":"bangladesh","zip_code":"1234","state":"Chattagram","city":"Chattagram","address":"Agrabad","facebook":"#","twitter":"#","linkedin":"#","instagram":"#","youtube":"#","site_color":"#42155c"}','created_at' => '2020-12-12 14:49:38','updated_at' => '2021-01-16 07:30:52'),
   array('id' => '4','key' => 'currency_info','value' => '{"currency_name":"USD","currency_icon":"$","currency_possition":"left"}','created_at' => '2020-12-12 14:49:38','updated_at' => '2020-12-12 14:49:38'),
-  array('id' => '5','key' => 'cron_info','value' => '{"send_mail_to_will_expire_within_days":"7","send_notification_expired_date":"on","auto_assign_to_default":"on","auto_approve":"on"}','created_at' => '2020-12-12 14:49:38','updated_at' => '2020-12-12 14:49:38'),
+
+  array('id' => '5','key' => 'cron_info','value' => '{"send_mail_to_will_expire_within_days":7,"alert_message":"i, your plan will expire soon.","expire_message":"our plan is expired!","trial_expired_message":"our free trial is expired!","auto_approve":"yes"}','created_at' => '2020-12-12 14:49:38','updated_at' => '2020-12-12 14:49:38'),
+
   array('id' => '6','key' => 'header','value' => '{"title":"SELL EVERYWHERE","highlight_title":"Increase your productivity","ytb_video":"75TGjNieK84","description":"Use one platform to sell products to anyone, anywhere\\u2014in person with Point of Sale and online through your website, social media, and online marketplaces.","preview":"uploads\\/1\\/2021\\/01\\/1610213945.webp"}','created_at' => '2020-12-18 17:14:36','updated_at' => '2021-01-09 18:05:30'),
   array('id' => '7','key' => 'faqs','value' => '{"description":"<h2>Site Audit<\\/h2>\\r\\n\\r\\n<p>Site Audit crawls all the pages it finds on your website &ndash; then provides an overall SEO health score, visualises key data in charts, flags all possible SEO issues and provides recommendations on how to fix them.<\\/p>\\r\\n\\r\\n<p>Have a huge website? Not an issue.<\\/p>\\r\\n\\r\\n<p><a href=\\"https:\\/\\/demos.creative-tim.com\\/impact-design-system\\/front\\/pages\\/about.html\\">Learn More&nbsp;<\\/a><\\/p>","preview":"uploads\\/1\\/2020\\/12\\/1608311802.svg"}','created_at' => '2020-12-18 17:16:42','updated_at' => '2020-12-18 17:19:03'),
   array('id' => '8','key' => 'marketing_tool','value' => '{"ga_measurement_id":"UA-180680025-1","analytics_view_id":"231381168","google_status":"on","fb_pixel":"","fb_pixel_status":""}','created_at' => '2020-12-25 17:32:48','updated_at' => '2020-12-25 17:32:48'),
@@ -251,6 +242,11 @@ class UserTableSeeder extends Seeder
   array('id' => '15','key' => 'auto_order','value' => 'yes','created_at' => '2021-02-21 18:14:35','updated_at' => '2021-02-21 18:14:44'), 
   array('id' => '16','key' => 'ecom_features','value' => '{"top_image":"uploads\/1\/2021\/03\/1615392340.png","center_image":"uploads\/1\/2021\/03\/1615392340.webp","bottom_image":"uploads\/1\/2021\/03\/1615392340.webp","area_title":"Market your business","description":"Take the guesswork out of marketing with built-in tools that help you create, execute, and analyze digital marketing campaigns.","btn_link":"#service","btn_text":"Service"}','created_at' => '2021-02-21 18:14:35','updated_at' => '2021-02-21 18:14:44'),
   array('id' => '17','key' => 'counter_area','value' => '{"happy_customer":"1000","total_reviews":"800","total_domain":"1200","community_member":"2000"}','created_at' => '2021-02-21 18:14:35','updated_at' => '2021-02-21 18:14:44'),
+
+  array('id' => '18','key' => 'instruction','created_at' => '2021-02-21 18:14:35','updated_at' => '2021-02-21 18:14:44', 'value' => '{"dns_configure_instruction":"You\'ll need to setup a DNS record to point to your store on our server. DNS records can be setup through your domain registrars control panel. Since every registrar has a different setup, contact them for assistance if you\'re unsure.","support_instruction":"DNS changes may take up to 48-72 hours to take effect, although it\'s normally a lot faster than that. You will receive a reply when your custom domain has been activated. Please allow 1-2 business days for this process to complete."}'),
+  
+  array('id' => 19, 'key'=>'tax','value'=>2,'created_at' => '2021-02-21 18:14:35','updated_at' => '2021-02-21 18:14:44'),
+  array('id' => 20, 'key'=>'site_key','value'=>env('SITE_KEY'),'created_at' => now(),'updated_at' => '2021-02-21 18:14:44')
 );
 
     Option::insert($options);
@@ -270,27 +266,170 @@ class UserTableSeeder extends Seeder
         Adminmenu::insert($adminmenus);
     
 
+   
 
     $plans = array(
-      array('id' => '1','name' => 'Basic','description' => 'Vitae inventore duci','price' => '5','days' => '30','product_limit' => '21','storage' => '98','status' => '1','custom_domain' => '0','featured' => '0','created_at' => '2020-12-12 14:51:30','updated_at' => '2021-01-16 07:27:51'),
-      array('id' => '2','name' => 'Starter Business','description' => 'test','price' => '19','days' => '30','product_limit' => '100','storage' => '10000','status' => '1','custom_domain' => '1','featured' => '1','created_at' => '2020-12-18 17:58:10','updated_at' => '2021-01-16 07:28:07'),
-      array('id' => '3','name' => 'Enterprise','description' => 'for enterprise users','price' => '1999','days' => '365','product_limit' => '99999','storage' => '99999','status' => '1','custom_domain' => '1','featured' => '0','created_at' => '2021-01-16 07:26:37','updated_at' => '2021-01-16 07:26:37')
+      array('id' => '1',
+        'name' => 'Free Trial',
+        'description' => 'free register',
+        'price' => '0',
+        'days' => '730',
+        'featured' => '0',
+        'status' => '1',
+        'data'=>json_encode(
+            array(
+                'product_limit' => 10000,
+                'storage' => 10000,
+                'customer_limit' => 10000,
+                'custom_domain' => true,
+                'inventory'=>true,
+                'pos'=>true,
+                'customer_panel'=>true,
+                'pwa'=>true,
+                'whatsapp'=>true,
+                'live_support'=>true,
+                'qr_code'=>true,
+                'facebook_pixel'=>true,
+                'custom_css'=>true,
+                'custom_js'=>true,
+                'gtm'=>true,
+                'location_limit'=>10000,
+                'category_limit'=>10000,
+                'brand_limit'=>10000,
+                'variation_limit'=>10000,
+                'google_analytics'=>true)),
+        'is_trial'=>1,
+        'created_at' => '2020-12-12 14:51:30',
+        'updated_at' => '2021-01-16 07:27:51'),
+
+       // array('id' => '2',
+       //  'name' => 'STARTER BUSINESS',
+       //  'description' => 'STARTER',
+       //  'price' => '250',
+       //  'days' => '30',
+       //  'featured' => '0',
+       //  'status' => '1',
+       //  'is_trial'=>0,
+       //  'data'=>json_encode(
+       //      array(
+       //          'product_limit' => 100,
+       //          'storage' => 50,
+       //          'custom_domain' => true,
+       //          'customer_limit' => 0,
+       //          'inventory'=>true,
+       //          'pos'=>true,
+       //          'customer_panel'=>true,
+       //          'pwa'=>true,
+       //          'whatsapp'=>true,
+       //          'live_support'=>true,
+       //          'qr_code'=>true,
+       //          'facebook_pixel'=>true,
+       //          'custom_css'=>true,
+       //          'custom_js'=>true,
+       //          'gtm'=>true,
+       //          'location_limit'=>0,
+       //          'category_limit'=>0,
+       //          'brand_limit'=>0,
+       //          'variation_limit'=>0,
+       //          'google_analytics'=>true)),
+       //  'created_at' => '2020-12-12 14:51:30',
+       //  'updated_at' => '2021-01-16 07:27:51'),
+
+       //   array('id' => '3',
+       //  'name' => 'ENTERPRISE',
+       //  'description' => 'FOR ENTERPRISE BUSINESS',
+       //  'price' => '400',
+       //  'days' => '385',
+       //  'featured' => '0',
+       //  'status' => '1',
+       //  'is_trial'=>0,
+       //  'data'=>json_encode(
+       //      array(
+       //          'product_limit' => '100',
+       //          'customer_limit' => '100',
+       //          'storage' => '50',
+       //          'custom_domain' => true,
+       //          'inventory'=>true,
+       //          'pos'=>true,
+       //          'customer_panel'=>true,
+       //          'pwa'=>true,
+       //          'whatsapp'=>true,
+       //          'live_support'=>true,
+       //          'qr_code'=>true,
+       //          'facebook_pixel'=>true,
+       //          'custom_css'=>true,
+       //          'custom_js'=>true,
+       //          'gtm'=>true,
+       //          'location_limit'=>10,
+       //          'category_limit'=>10,
+       //          'brand_limit'=>10,
+       //          'variation_limit'=>10,
+       //          'google_analytics'=>true)),
+       //  'created_at' => '2020-12-12 14:51:30',
+       //  'updated_at' => '2021-01-16 07:27:51'),
+
+       
+
+    //   array(
+    //     'id' => '2',
+    //     'name' => '',
+    //     'description' => 'STARTER BUSINESS',
+    //     'price' => '250',
+    //     'days' => '30',
+    //     'status' => '1',
+    //     'data'=>json_encode(array(
+    //     'product_limit' => '50',
+    //     'storage' => '30',
+    //     'custom_domain' => false,
+    //     'inventory'=>false,
+    //     'pos'=>false,
+    //     'customer_panel'=>false,
+    //     'pwa'=>false,
+    //     'whatsapp'=>false,
+    //     'live_support'=>false,
+    //     'qr_code'=>false,
+    //     'facebook_pixel'=>false,
+    //     'custom_css'=>false,
+    //     'custom_js'=>false,
+    //     'gtm'=>false,
+    //     'google_analytics'=>false
+    //    )),'created_at' => '2020-12-12 14:51:30','updated_at' => '2021-01-16 07:27:51'),
+
+    //   array('id' => '3','name' => '','description' => 'STARTER BUSINESS','price' => '500','days' => '365','featured' => '0','status' => '1','data'=>json_encode(array(
+    //     'product_limit' => '100',
+    //     'storage' => '50',
+    //     'custom_domain' => true,
+    //     'inventory'=>true,
+    //     'pos'=>true,
+    //     'customer_panel'=>true,
+    //     'pwa'=>true,
+    //     'whatsapp'=>true,
+    //     'live_support'=>true,
+    //     'qr_code'=>true,
+    //     'facebook_pixel'=>true,
+    //     'custom_css'=>true,
+    //     'custom_js'=>true,
+    //     'gtm'=>true,
+    //     'google_analytics'=>true
+    // )),'created_at' => '2020-12-12 14:51:30','updated_at' => '2021-01-16 07:27:51')
+
+     
   );
-    Plan::insert($plans);
+   Plan::insert($plans);
 
-    $terms = array(
-      array('id' => '34','title' => 'terms and condition','slug' => 'terms-and-condition','user_id' => '1','status' => '1','featured' => '0','type' => 'page','is_admin' => '1','created_at' => '2021-01-11 10:52:34','updated_at' => '2021-01-11 10:52:34')
-  );
+  //   $terms = array(
+  //     array('id' => '34','title' => 'terms and condition','slug' => 'terms-and-condition','user_id' => '1','status' => '1','featured' => '0','type' => 'page','is_admin' => '1','created_at' => '2021-01-11 10:52:34','updated_at' => '2021-01-11 10:52:34')
+  //   );
 
-    Term::insert($terms);
+  //   Term::insert($terms);
 
 
-    $metas = array(
-      array('id' => '59','term_id' => '34','key' => 'excerpt','value' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960'),
-      array('id' => '60','term_id' => '34','key' => 'content','value' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum')
-  );
+  //   $metas = array(
+  //     array('id' => '59','term_id' => '34','key' => 'excerpt','value' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960'),
+  //     array('id' => '60','term_id' => '34','key' => 'content','value' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum')
+  // );
 
-    Meta::insert($metas);
+  //   Meta::insert($metas);
 
 }
 

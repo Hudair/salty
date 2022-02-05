@@ -197,6 +197,7 @@ class CronController extends Controller
         }
         $option=Option::where('key','cron_info')->first();
         $info=json_decode($option->value);
+       
        return view('admin.cron.index',compact('info'));
     }
 
@@ -208,8 +209,40 @@ class CronController extends Controller
 
     public function send_mail_to_will_expire_plan_soon()
     {
-        Artisan::call('make:send_mail_to_will_expire_plan_soon');
-        return "done";
+       //before expired how many days left
+          $option = Option::where('key','cron_option')->first();
+         $cron_option = json_decode($option->value);
+
+         $date= Carbon::now()->addDays($cron_option->days)->format('Y-m-d');
+         
+         $tenants=Tenant::where([['status',1],['will_expire','<=',$date],['auto_renew',0],['will_expire','!=',Carbon::now()->format('Y-m-d')]])->with('orderwithplan','user')->get();
+         
+        
+         $expireable_tenants=[];
+
+         foreach($tenants as $row){
+            $plan=$row->orderwithplan->plan;
+            
+            if (!empty($plan)) {
+                if($row->orderwithplan->plan->is_trial == 0){
+                   $order_info['email']=$row->user->email;
+                   $order_info['name']=$row->user->name;
+                   $order_info['plan_name']=$plan->name;
+                   $order_info['tenant_id']=$row->id;
+                   $order_info['will_expire']=$row->will_expire;
+                   $order_info['amount']=$plan->price;
+                   $order_info['plan_name']=$plan->name;
+                   array_push($expireable_tenants, $order_info);
+                  
+               }
+               
+            }
+         }
+         
+
+         $this->expireSoon($expireable_tenants,$cron_option->alert_message);
+        
+         return "success";
     }
 
 
@@ -218,8 +251,9 @@ class CronController extends Controller
         $option=Option::where('key','cron_info')->first();
         $data=json_decode($option->value);
         $info['send_mail_to_will_expire_within_days']=$request->send_mail_to_will_expire_within_days;
-        $info['send_notification_expired_date']=$request->send_notification_expired_date;
-        $info['auto_assign_to_default']=$request->auto_assign_to_default;
+        $info['expire_message']=$request->expire_message;
+        $info['trial_expired_message']=$request->trial_expired_message;
+        $info['alert_message']=$request->alert_message;
         $info['auto_approve']=$request->auto_approve;
         $option->value=json_encode($info);
         $option->save();

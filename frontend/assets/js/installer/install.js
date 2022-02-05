@@ -11,7 +11,7 @@
 	 		}
 	 	});
 	 	$.ajax({
-	 		type: 'GET',
+	 		type: 'POST',
 	 		url: url,
 	 		data: new FormData(this),
 	 		dataType: 'html',
@@ -39,7 +39,7 @@
 	 		}
 	 	});
 	 	$.ajax({
-	 		type: 'GET',
+	 		type: 'POST',
 	 		url: url,
 	 		data: new FormData(this),
 	 		dataType: 'html',

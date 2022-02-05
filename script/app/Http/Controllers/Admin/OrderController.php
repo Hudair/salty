@@ -10,8 +10,12 @@ use App\Models\Userplanmeta;
 use App\Models\User;
 use App\Plan;
 use App\Trasection;
+use App\Domain;
 use App\Mail\SubscriptionMail;
 use Illuminate\Support\Facades\Mail;
+use DB;
+use Route;
+use App\Option;
 class OrderController extends Controller
 {
 
@@ -37,28 +41,28 @@ class OrderController extends Controller
             if ($type==='all') {
                  $posts=Userplan::whereHas('user',function($q){
                     return $q->where('email',$this->user_email);
-                 })->with('user','plan_info','payment_method')->latest()->paginate(40);
+                 })->with('user','plan_info','category')->latest()->paginate(40);
              }
              else{
                 $posts=Userplan::whereHas('user',function($q){
                     return $q->where('email',$this->user_email);
-                 })->with('user','plan_info','payment_method')->where('status',$type)->latest()->paginate(40);
+                 })->with('user','plan_info','category')->where('status',$type)->latest()->paginate(40);
             }
         }
         elseif (!empty($request->src)) {
              if ($type==='all') {
-                 $posts=Userplan::with('user','plan_info','payment_method')->where($request->term,$request->src)->latest()->paginate(40);
+                 $posts=Userplan::with('user','plan_info','category')->where($request->term,$request->src)->latest()->paginate(40);
              }
              else{
-                $posts=Userplan::with('user','plan_info','payment_method')->where($request->term,$request->src)->where('status',$type)->latest()->paginate(40);
+                $posts=Userplan::with('user','plan_info','category')->where($request->term,$request->src)->where('status',$type)->latest()->paginate(40);
             }
         }
         else{
           if ($type==='all') {
-           $posts=Userplan::with('user','plan_info','payment_method')->latest()->paginate(40);
+           $posts=Userplan::with('user','plan_info','category')->latest()->paginate(40);
           }
         else{
-            $posts=Userplan::with('user','plan_info','payment_method')->where('status',$type)->latest()->paginate(40);
+            $posts=Userplan::with('user','plan_info','category')->where('status',$type)->latest()->paginate(40);
           }  
         }
 
@@ -99,7 +103,7 @@ class OrderController extends Controller
             'transition_id' => 'required',
             'plan' => 'required',
             'notification_status' => 'required',
-            'order_status' => 'required',
+            
         ]);
 
         if ($request->notification_status == 'yes' && $request->content==null) {
@@ -112,54 +116,45 @@ class OrderController extends Controller
             return response()->json($msg,401);
         }
 
+        
+        $plan=Plan::findorFail($request->plan);
+        $exp_days =  $plan->days;
+        $expiry_date = \Carbon\Carbon::now()->addDays(($exp_days))->format('Y-m-d');
 
-        $order_prefix=\App\Option::where('key','order_prefix')->first();
+        $max_order=Userplan::max('id');
+        $order_prefix=Option::where('key','order_prefix')->first();
+        $tax=Option::where('key','tax')->first();
+        $tax= ($plan->price / 100) * $tax->value;
+        $order_no = $order_prefix->value.$max_order;
 
-        $trasection=new Trasection;
-        $trasection->user_id=$user->id;
-        $trasection->category_id = $request->payment_method;  
-        $trasection->status=$request->payment_status;  
-        $trasection->trasection_id=$request->transition_id;  
-        $trasection->save();
+        $order=new Userplan;
+        $order->order_no=$order_no;
+        $order->amount=$plan->price;
+        $order->tax=$tax;
+        $order->trx=$request->transition_id;
+        $order->will_expire=$expiry_date;
+        $order->user_id=$user->id;
+        $order->plan_id=$plan->id;
+        $order->category_id=$request->payment_method;
+        $order->payment_status = 1;
+        $order->status=1;
+        $order->save();
 
-        $price=Plan::find($request->plan);
-        $exp_days =  $price->days;
-        $expiry_date = \Carbon\Carbon::now()->addDays(($exp_days - 1))->format('Y-m-d');
+        $dom=Domain::where('user_id',$user->id)->first();
+        $dom->data=$plan->data;
+        $dom->userplan_id=$order->id;
+        $dom->will_expire=$expiry_date;
+        $dom->is_trial=0;
+        $dom->save();
 
 
-        $max_id=Userplan::max('id');
-        $max_id= $max_id + 1;
+        $dom->orderlog()->create(['userplan_id'=>$order->id,'domain_id'=>$dom->id]);
 
-        $plan=new Userplan;
-        $plan->order_no=$order_prefix->value.$max_id;
-        $plan->amount=$price->price;
-        $plan->user_id=$user->id;
-        $plan->plan_id =$request->plan;
-        $plan->trasection_id=$trasection->id;
-        $plan->will_expired=$expiry_date;
-        $plan->status=$request->order_status;
-        $plan->payment_status=$request->payment_status;
-        $plan->save();
-        if($request->order_status == 1){
-          $meta=Userplanmeta::where('user_id',$user->id)->first();
-          if(empty($meta)){
-            $meta=new Userplanmeta;
-          }
-            $meta->user_id=$user->id;
-            $meta->name=$price->name;
-            $meta->product_limit=$price->product_limit;
-            $meta->storage=$price->storage;
-            $meta->customer_limit=$price->customer_limit;
-            $meta->category_limit=$price->category_limit;
-            $meta->location_limit=$price->location_limit;
-            $meta->brand_limit=$price->brand_limit;
-            $meta->variation_limit=$price->variation_limit;
-            $meta->save();  
-        }
+
         
 
          if ($request->notification_status == 'yes'){
-            $data['info']=Userplan::with('plan_info','payment_method','user')->find($plan->id);
+            $data['info']=Userplan::with('plan_info','category','user')->find($order->id);
             $data['comment']=$request->content;
             $data['to_vendor']='vendor';
             if(env('QUEUE_MAIL') == 'on'){
@@ -185,7 +180,7 @@ class OrderController extends Controller
         if (!Auth()->user()->can('order.view')) {
             return abort(401);
         }
-        $info=Userplan::with('plan_info','payment_method','user')->findorFail($id);
+        $info=Userplan::with('plan_info','category','user')->findorFail($id);
         $user=User::with('user_domain')->find($info->user->id);
        
         return view('admin.order.show',compact('info','user'));
@@ -199,7 +194,7 @@ class OrderController extends Controller
      */
     public function invoice($id)
     {
-        $info=Userplan::with('plan_info','payment_method','user')->findorFail($id);
+        $info=Userplan::with('plan_info','category','user')->findorFail($id);
         $user=User::with('user_domain')->find($info->user->id);
         $company_info=\App\Option::where('key','company_info')->first();
         $company_info=json_decode($company_info->value);
@@ -220,7 +215,7 @@ class OrderController extends Controller
             return abort(401);
         }
 
-        $info= Userplan::with('plan_info','payment_method')->find($id);
+        $info= Userplan::find($id);
         $payment_getway=\App\Category::where('type','payment_getway')->get();
         $posts=Plan::get();
 
@@ -241,41 +236,43 @@ class OrderController extends Controller
              return response()->json($msg,401);
         }
 
-        $plan=Userplan::findorFail($id);
-        $plan->plan_id =$request->plan;
-        $plan->status=$request->order_status;
-        $plan->save();
+        DB::beginTransaction();
+        try {
 
-        if (!empty($plan->trasection_id)) {
-            $trasection= Trasection::findorFail($plan->trasection_id);
-            $trasection->trasection_id=$request->trasection_id;
-            $trasection->category_id =$request->trasection_method;
-            $trasection->status=$request->payment_status;
-            $trasection->save(); 
-        }
-        $user=User::find($plan->user_id);
-        if($request->order_status == 1){
-          $meta=Userplanmeta::where('user_id',$user->id)->first();
-          $price=Plan::find($plan->plan_id);
-          if(empty($meta)){
-            $meta=new Userplanmeta;
-          }
-            $meta->user_id=$user->id;
-            $meta->name=$price->name;
-            $meta->product_limit=$price->product_limit;
-            $meta->storage=$price->storage;
-            $meta->customer_limit=$price->customer_limit;
-            $meta->category_limit=$price->category_limit;
-            $meta->location_limit=$price->location_limit;
-            $meta->brand_limit=$price->brand_limit;
-            $meta->variation_limit=$price->variation_limit;
-           
-            $meta->save();  
+        $order=Userplan::findorFail($id);
+        $order->plan_id =$request->plan;
+        $order->order_no=$request->order_no;
+        $order->amount=$request->amount;
+        $order->tax=$request->tax;
+        $order->trx=$request->trx;
+        $order->status=$request->order_status;
+        $order->category_id =$request->category_id;
+        $order->payment_status=$request->payment_status;
+        $order->save();
+        $user=User::find($order->user_id);
+        
+        if($request->subscription_status == 1){
+                $plan=Plan::find($order->plan_id);
+                
+                $exp_days =  $plan->days;
+                $expiry_date = \Carbon\Carbon::now()->addDays(($exp_days))->format('Y-m-d');
+                $dom=Domain::where('user_id',$order->user_id)->first();
+                $dom->data=$plan->data;
+                $dom->userplan_id=$order->id;
+                $dom->will_expire=$expiry_date;
+                $dom->is_trial=0;
+                $dom->save();
+                $dom->orderlog()->create(['userplan_id'=>$order->id,'domain_id'=>$dom->id]);
+
         }
 
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollback();
+        }
 
         if ($request->notification_status == 'yes'){
-            $data['info']=Userplan::with('plan_info','payment_method','user')->find($plan->id);
+            $data['info']=Userplan::with('plan_info','category','user')->find($order->id);
             $data['comment']=$request->content;
             $data['to_vendor']='vendor';
             if(env('QUEUE_MAIL') == 'on'){
@@ -306,9 +303,6 @@ class OrderController extends Controller
             if ($request->method=='delete') {
                 foreach ($request->ids as $key => $id) {
                     $order=Userplan::find($id);
-                    if (!empty($order->trasection_id)) {
-                        Trasection::destroy($order->trasection_id);
-                    }
                     $order->delete();
                 }
             }
@@ -328,5 +322,10 @@ class OrderController extends Controller
         }
 
         return response()->json(['Success']);
+    }
+
+    public function __construct()
+    {
+        abort_if(!Route::has('admin.order.index'),404);
     }
 }

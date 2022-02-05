@@ -72,7 +72,7 @@ $currency_info=currency_info();
  <!-- FOR BOOTSTRAP -->
  <script src="{{ asset('frontend/bigbag/js/jquery-3.5.1.min.js')}}"></script>
  <script src="{{ asset('assets/js/jquery.unveil.js') }}"></script>
- <script src="{{ asset('frontend/bigbag/js/cart.js?v=1.0')}}"></script>
+ <script src="{{ asset('frontend/bigbag/js/cart.js?v=1.1')}}"></script>
  <script src="{{ asset('frontend/bigbag/js/popper.min.js')}}"></script>
  <script src="{{ asset('frontend/bigbag/js/bootstrap.min.js')}}"></script>
  <!-- FOR SLICK SLIDER -->

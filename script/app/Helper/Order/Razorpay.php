@@ -163,6 +163,11 @@ class Razorpay
         // If Signature is not correct its give a excetption so we use try catch
             return false;
         }
+    }
+
+     public function __construct()
+    {
+        abort_if(!\Route::has('admin.plan.index'),404);
     }   
 
 

@@ -7,6 +7,7 @@ use Session;
 use Illuminate\Support\Facades\Http;
 use App\Getway;
 use App\Order;
+use Route;
 class Instamojo 
 {
 	
@@ -115,5 +116,10 @@ class Instamojo
             Session::forget('customer_order_info');
             return redirect(Instamojo::redirect_if_payment_faild());
         }
+    }
+
+    public function __construct()
+    {
+        abort_if(!Route::has('admin.plan.index'),404);
     }
 }

@@ -124,6 +124,9 @@ function render_products(data,target,badge_status=false) {
        if(value.options.length > 0){
         next=true;
        }
+       if(value.affiliate != null){
+        next=true;
+       }
 
        
        if(next == false && value.stock.stock_manage != 1){
@@ -228,6 +231,9 @@ function render_products(data,target,badge_status=false) {
    }
    if(value.options.length > 0){
     next=true;
+   }
+   if(value.affiliate != null){
+        next=true;
    }
 
    

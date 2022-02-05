@@ -9,6 +9,7 @@ use Spatie\Analytics\Period;
 use Auth;
 use App\Order;
 use App\Term;
+use App\Domain;
 use Analytics;
 class DashboardController extends Controller
 {
@@ -106,10 +107,13 @@ class DashboardController extends Controller
 		$data['pages']=$pages;
 		$data['storage_used']=(float)str_replace(',', '', $storage_size);
 
+		$plan_info=Domain::where('user_id',Auth::id())->first();
+		
+		$plan_data=json_decode($plan_info->data);
 		$plan=Auth::user()->user_plan->plan_info->name ?? '';
-		$product_limit=Auth::user()->user_plan->plan_info->product_limit ?? 0;
-		$storage=Auth::user()->user_plan->plan_info->storage ?? 0;
-		$will_expired=Auth::user()->user_plan->will_expired ?? null;
+		$product_limit=$plan_data->product_limit;
+		$storage=$plan_data->storage;
+		$will_expired=$plan_info->will_expire;
 
 		$data['plan_name']=$plan;
 		$data['product_limit']=$product_limit;
@@ -188,7 +192,13 @@ class DashboardController extends Controller
 	public function fetchTotalVisitorsAndPageViews($period)
 	{
 		
-		return Analytics::fetchTotalVisitorsAndPageViews(Period::days($period));
+		return Analytics::fetchTotalVisitorsAndPageViews(Period::days($period))->map(function($data)
+        {
+            $row['date']=$data['date']->format('Y-m-d');
+            $row['visitors']=$data['visitors'];
+            $row['pageViews']=$data['pageViews'];
+            return $row;
+        });
 				
 	}
 	public function fetchMostVisitedPages($period)

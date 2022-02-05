@@ -36,6 +36,15 @@
                     </div>
                 </div>
             </div>
+            @if(Session::has('error'))
+            <div class="col-sm-12">
+              <div class="col-md-12">
+                <div class="alert alert-warning">
+                    {{ Session::get('error') }}
+                </div>
+            </div>
+            </div>
+            @endif
             <div class="card">
                 <div class="card-header">
                     <h4>{{ __('Orders') }}</h4>

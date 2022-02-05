@@ -21,7 +21,7 @@
 
 							<div class="profile-widget-item">
 								<div class="profile-widget-item-label">{{ __('Will Expired') }}</div>
-								<div class="profile-widget-item-value">{{ $info->user_plan->will_expired ?? '' }}</div>
+								<div class="profile-widget-item-value">{{ $info->user_domain->will_expire }}</div>
 							</div>
 
 							<div class="profile-widget-item">
@@ -55,6 +55,7 @@
 							<li class="list-group-item">{{ __('Storage Used:') }} {{ folderSize('uploads/'.$info->id) }}MB / {{ $info->user_plan->plan_info->storage ?? 0 }} MB</li>
 
 							<li class="list-group-item">{{ __('Joining Date:') }} {{ $info->created_at->format('d-F-Y') }}</li>
+
 						</ul>
 
 					</div>
@@ -123,17 +124,17 @@
 								</thead>
 								<tbody>
 									@foreach($histories as $row)
-									@isset($row->payment_method->trasection_id)
+									
 									<tr>
-										<td><a href="{{ route('admin.order.show',$info->id) }}">{{ $row->order_no }}</a></td>
+										<td><a href="{{ route('admin.order.show',$row->id) }}">{{ $row->order_no }}</a></td>
 										<td>{{ $row->plan_info->name }}</td>
 										<td>{{ $row->amount }}</td>
-										<td>{{ $row->payment_method->method->name ?? '' }}</td>
-										<td>{{ $row->payment_method->trasection_id ?? '' }}</td>
+										<td>{{ $row->category->name ?? '' }}</td>
+										<td>{{ $row->trx ?? '' }}</td>
 										<td>{{ $row->created_at->format('d-F-Y') }}</td>
-										<td><a href="{{ route('admin.order.edit',$info->id) }}" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i></a></td>
+										<td><a href="{{ route('admin.order.edit',$row->id) }}" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i></a></td>
 									</tr>
-									@endisset
+									
 									@endforeach
 								</tbody>
 

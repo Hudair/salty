@@ -17,8 +17,21 @@ class MarketingController extends Controller
      */
     public function store(Request $request)
     {
-      
+         $plan=user_limit();
+         
        if ($request->type=='google-analytics') {
+           
+        
+          
+            $google_analytics=filter_var($plan['google_analytics']);
+            if($google_analytics == false){
+               $msg='This module did not support your subscription.';
+               $error['errors']['error']=$msg;
+               return response()->json($error,401);
+               
+            } 
+
+
             $validatedData = $request->validate([
                 'ga_measurement_id' => 'required|max:50',
                 'analytics_view_id' => 'required|max:50',
@@ -50,7 +63,14 @@ class MarketingController extends Controller
        }
 
        if ($request->type=='tag-manager') {
-            
+             $google_analytics=filter_var($plan['gtm']);
+            if($google_analytics == false){
+               $msg='This module did not support your subscription.';
+               $error['errors']['error']=$msg;
+               return response()->json($error,401);
+               
+            } 
+
             $validatedData = $request->validate([
                 'tag_id' => 'required|max:50',
             ]);
@@ -74,6 +94,14 @@ class MarketingController extends Controller
 
 
        if ($request->type=='whatsapp') {
+            $google_analytics=filter_var($plan['whatsapp']);
+            if($google_analytics == false){
+               $msg='This module did not support your subscription.';
+               $error['errors']['error']=$msg;
+               return response()->json($error,401);
+               
+            } 
+
             $validatedData = $request->validate([
                 'number' => 'required|max:20',
                 'shop_page_pretext' => 'required|max:50',
@@ -99,6 +127,14 @@ class MarketingController extends Controller
            return response()->json(['Whatsapp Settings Updated']);
        }
       if ($request->type=='fb_pixel') {
+           $google_analytics=filter_var($plan['facebook_pixel']);
+            if($google_analytics == false){
+               $msg='This module did not support your subscription.';
+               $error['errors']['error']=$msg;
+               return response()->json($error,401);
+               
+            } 
+
           $validatedData = $request->validate([
             'pixel_id' => 'required|max:40',
             

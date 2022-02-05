@@ -12,11 +12,11 @@
     <!-- Place favicon.ico in the root directory -->
 
     <!-- CSS here -->
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/fontawesome-all.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/font.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/default.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/style.css') }}">
+    < <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/font.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/default.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/style.css') }}">
 </head>
 <body class="install">
     <!--[if lte IE 9]>
@@ -30,23 +30,27 @@
             <div class="content-requirments d-flex justify-content-center">
                 <div class="requirments-main-content">
                     <div class="installer-header text-center">
+                        <h2>{{ __('Purchase Code') }}</h2>
                         <p>{{ __('Please enter your Purchase Code') }}</p>
                     </div>
                  <div class="alert" role="alert">
-                     @if(session()->has('alert-success'))
+                        
+                        
+                        @if(isset($request['msg']))
+                        
                         <div class="alert alert-danger">
-                            {{ session()->get('alert-success') }}
+                            {{ $request['msg'] ?? '' }}
                         </div>
-                    @endif
+                        @endif
                  </div>
-                 <form action="{{ route('purchase_check') }}" method="POST">
+                 <form action="{{ url('/install/purchase_check') }}" method="POST">
                     @csrf
                     <div class="custom-form install-form">
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label for="purchase_code">{{ __('Purchase code') }}</label>
-                                    <input type="text" class="form-control" id="purchase_code" name="purchase_code" required placeholder="Enter random value!">
+                                    <input type="text" class="form-control" id="purchase_code" name="purchase_code" required placeholder="Enter Your Purchase code">
                                 </div>
                             </div>
                         </div>
@@ -58,7 +62,7 @@
         </div>
     </section>
     <!-- requirments-section-end -->
-    <script src="{{ asset('assets/installer/js/vendor/jquery-3.5.1.min.js') }}"></script>
-    <script src="{{ asset('assets/installer/js/install/install.js') }}"></script>
+   <script src="{{ asset('frontend/assets/js/installer/jquery-3.5.1.min.js') }}"></script>
+    <script src="{{ asset('frontend/assets/js/installer/install.js') }}"></script>
 </body>
 </html>

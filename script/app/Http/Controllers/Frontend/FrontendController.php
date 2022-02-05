@@ -29,6 +29,7 @@ class FrontendController extends Controller
 
     public function index(Request $request)
     {
+
          $url=$request->getHost();
          $url=str_replace('www.','',$url);
         
@@ -338,7 +339,7 @@ class FrontendController extends Controller
       $user_id=domain_info('user_id');
 
 
-      $info=Term::where('user_id',$user_id)->where('type','product')->where('status',1)->with('medias','content','categories','brands','seo','price','options','stock')->findorFail($id);
+      $info=Term::where('user_id',$user_id)->where('type','product')->where('status',1)->with('affiliate','medias','content','categories','brands','seo','price','options','stock')->findorFail($id);
       $next = Term::where('user_id',$user_id)->where('type','product')->where('status',1)->where('id', '>', $id)->first();
       $previous = Term::where('user_id',$user_id)->where('type','product')->where('status',1)->where('id', '<', $id)->first();
 
@@ -577,7 +578,7 @@ class FrontendController extends Controller
     	$avg=(int)$avg;
     	$related=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->whereHas('post_categories',function($q){
             $q->whereIn('category_id',$this->cats);
-        })->with('preview','attributes','category','price','options','stock')->withCount('reviews')->latest()->take(20)->get();
+        })->with('preview','attributes','category','price','options','stock','affiliate')->withCount('reviews')->latest()->take(20)->get();
 
     	 $get_latest_products=  $this->get_latest_products();
     	 $data['get_latest_products']=$get_latest_products;
@@ -615,7 +616,7 @@ class FrontendController extends Controller
 
       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->whereHas('post_categories',function($q){
         $q->whereIn('category_id',$this->cats);
-      })->with('preview','attributes','category','price','options','stock')->latest()->paginate(30);
+      })->with('preview','attributes','category','price','options','stock','affiliate')->latest()->paginate(30);
 
       return response()->json($posts);
     }
@@ -623,7 +624,7 @@ class FrontendController extends Controller
     public function product_search(Request $request)
     {
       $user_id=domain_info('user_id');
-      $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->where('title','LIKE','%'.$request->src.'%')->with('preview','attributes','category','price','options','stock')->latest()->paginate(30);
+      $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->where('title','LIKE','%'.$request->src.'%')->with('preview','attributes','category','price','options','stock','affiliate')->latest()->paginate(30);
       return response()->json($posts);
     }
 
@@ -675,13 +676,13 @@ class FrontendController extends Controller
     public function get_products(Request $request)
     {
       $user_id=domain_info('user_id');
-      $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock')->withCount('reviews')->latest()->paginate(30);
+      $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock','affiliate')->withCount('reviews')->latest()->paginate(30);
        return response()->json($posts);
     }
     public function get_offerable_products($limit=20)
     {
       $user_id=domain_info('user_id');
-      $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock')->whereHas('price',function($q){
+      $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock','affiliate')->whereHas('price',function($q){
         return $q->where('ending_date','>=',date('Y-m-d'))->where('starting_date','<=',date('Y-m-d'));
       })->withCount('reviews')->inRandomOrder()->take(20)->get();
        return $posts;
@@ -691,7 +692,7 @@ class FrontendController extends Controller
     public function get_latest_products($limit=20)
     {
        $user_id=domain_info('user_id');
-       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock')->withCount('reviews')->latest()->take($limit)->get();
+       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock','affiliate')->withCount('reviews')->latest()->take($limit)->get();
        return $posts;
 
     } 
@@ -758,7 +759,7 @@ class FrontendController extends Controller
        $this->attrs = $request->attrs ?? [];
        $this->cats=$request->categories ?? [];
 
-       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock')->withCount('reviews');
+       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock','affiliate')->withCount('reviews');
 
        if(!empty($request->term)){
         $data= $posts->where('title','LIKE','%'.$request->term.'%');
@@ -808,21 +809,21 @@ class FrontendController extends Controller
     {
        $limit=request()->route()->parameter('limit') ?? 20;
        $user_id=domain_info('user_id');
-       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock')->withCount('reviews')->inRandomOrder()->take($limit)->get();
+       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->with('preview','attributes','category','price','options','stock','affiliate')->withCount('reviews')->inRandomOrder()->take($limit)->get();
        return $posts;
     }
 
     public function get_trending_products($limit=20)
     {
        $user_id=domain_info('user_id');
-       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->where('featured',1)->with('preview','attributes','category','price','options','stock')->withCount('reviews')->latest()->take($limit)->get();
+       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->where('featured',1)->with('preview','attributes','category','price','options','stock','affiliate')->withCount('reviews')->latest()->take($limit)->get();
        return $posts;
     }
 
     public function get_best_selling_product($limit=20)
     {
        $user_id=domain_info('user_id');
-       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->where('featured',2)->with('preview','attributes','category','price','options','stock')->withCount('reviews')->latest()->take($limit)->get();
+       $posts=Term::where('user_id',$user_id)->where('status',1)->where('type','product')->where('featured',2)->with('preview','attributes','category','price','options','stock','affiliate')->withCount('reviews')->latest()->take($limit)->get();
        return $posts;
     }
 

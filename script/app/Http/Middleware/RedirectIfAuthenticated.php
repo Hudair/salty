@@ -55,7 +55,7 @@ class RedirectIfAuthenticated
             }
             else{
                $url= Auth::user()->user_domain->full_domain ?? env('APP_APP_URL');
-                if (url('/') != $url) {
+                if (str_replace('www.', '', url('/')) != $url) {
                  Auth::logout();
                  return redirect($url.'/login');
                 }

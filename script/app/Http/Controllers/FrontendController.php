@@ -30,6 +30,7 @@ use Artesaos\SEOTools\Facades\JsonLd;
 use App\Models\Userplanmeta;
 use Illuminate\Http\Request;
 use DB;
+use Str;
 class FrontendController extends Controller
 {
     public function welcome(Request $request)
@@ -61,19 +62,19 @@ class FrontendController extends Controller
        SEOTools::jsonLd()->addImage(asset('uploads/logo.png'));
 
 
-    	$latest_gallery=Category::where('type','gallery')->with('preview')->where('is_admin',1)->latest()->take(15)->get();
-    	$features=Category::where('type','features')->with('preview','excerpt')->where('is_admin',1)->latest()->take(6)->get(); 
-    	
-    	$testimonials=Category::where('type','testimonial')->with('excerpt')->where('is_admin',1)->latest()->get(); 
+      $latest_gallery=Category::where('type','gallery')->with('preview')->where('is_admin',1)->latest()->take(15)->get();
+      $features=Category::where('type','features')->with('preview','excerpt')->where('is_admin',1)->latest()->take(6)->get(); 
+      
+      $testimonials=Category::where('type','testimonial')->with('excerpt')->where('is_admin',1)->latest()->get(); 
 
-    	$brands=Category::where('type','brand')->with('preview')->where('is_admin',1)->latest()->get(); 
+      $brands=Category::where('type','brand')->with('preview')->where('is_admin',1)->latest()->get(); 
 
-    	$plans=Plan::where('status',1)->where('is_default',0)->latest()->take(3)->get();
-    	$header=Option::where('key','header')->first();
-    	$header=json_decode($header->value ?? '');
+      $plans=Plan::where('status',1)->where('is_default',0)->latest()->take(3)->get();
+      $header=Option::where('key','header')->first();
+      $header=json_decode($header->value ?? '');
 
-    	$about_1=Option::where('key','about_1')->first();
-    	$about_1=json_decode($about_1->value ?? '');
+      $about_1=Option::where('key','about_1')->first();
+      $about_1=json_decode($about_1->value ?? '');
        
         $about_2=Option::where('key','about_2')->first();
         $about_2=json_decode($about_2->value ?? '');
@@ -87,7 +88,7 @@ class FrontendController extends Controller
         $counter_area=Option::where('key','counter_area')->first();
         $counter_area=json_decode($counter_area->value ?? '');
 
-    	return view('welcome',compact('latest_gallery','plans','features','header','about_1','about_3','about_2','testimonials','brands','ecom_features','counter_area'));
+      return view('welcome',compact('latest_gallery','plans','features','header','about_1','about_3','about_2','testimonials','brands','ecom_features','counter_area'));
 
        }
        return redirect('/check');
@@ -240,8 +241,9 @@ class FrontendController extends Controller
 
     public function register_view($id)
     {
-    	$info=Plan::where('status',1)->findorFail($id);
-    	return view('marchant.register',compact('info'));
+     
+       $info=Plan::where('status',1)->where('is_trial',1)->findorFail($id);
+      return view('marchant.register',compact('info'));
     }
 
     public function translate(Request $request){
@@ -253,7 +255,8 @@ class FrontendController extends Controller
 
     public function register(Request $request,$id)
     {
-    	
+      
+
           if(env('NOCAPTCHA_SITEKEY') != null){
            $messages = [
                 'g-recaptcha-response.required' => 'You must check the reCAPTCHA.',
@@ -272,196 +275,120 @@ class FrontendController extends Controller
             }
         }
         
-        \Validator::extend('without_spaces', function($attr, $value){
-    		return preg_match('/^\S*$/u', $value);
-    	});
+        
 
-    	$validatedData = $request->validate([
-    		'name' => 'required|string|max:255',
-    		'email' => 'required|unique:users|email|max:255',
-    		'password' => 'required|min:8|confirmed|string',
-    		'domain' => 'required|max:50|without_spaces|string',
-    	]);
+      $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|unique:users|email|max:255',
+        'password' => 'required|min:8|confirmed|string',
+        'domain' => 'required|max:20|string',
+      ]);
 
-    	$info=Plan::where('status',1)->findorFail($id);
-    	if ($info->custom_domain == 0) {
-    		$domain=strtolower($request->domain).'.'.env('APP_PROTOCOLESS_URL');
-    		$input = trim($domain, '/');
-    		if (!preg_match('#^http(s)?://#', $input)) {
-    			$input = 'http://' . $input;
-    		}
-    		$urlParts = parse_url($input);
-    		$domain = preg_replace('/^www\./', '', $urlParts['host']);
-    		$full_domain=env('APP_PROTOCOL').$domain;
-    	}
-    	else{
-    		$validatedData = $request->validate([
-    		'full_domain' => 'required|string|max:50',
-    	    ]);
-    		$domain=strtolower($request->domain);
-    		$input = trim($domain, '/');
-    		if (!preg_match('#^http(s)?://#', $input)) {
-    			$input = 'http://' . $input;
-    		}
-    		$urlParts = parse_url($input);
-    		$domain = preg_replace('/^www\./', '', $urlParts['host']);
+      $info=Plan::where('status',1)->where('is_trial',1)->findorFail($id);
+      
+        $domain=strtolower(Str::slug($request->domain)).'.'.env('APP_PROTOCOLESS_URL');
+        $input = trim($domain, '/');
+        if (!preg_match('#^http(s)?://#', $input)) {
+             $input = 'http://' . $input;
+        }
+        $urlParts = parse_url($input);
+        $domain = preg_replace('/^www\./', '', $urlParts['host']);
+        $full_domain=env('APP_PROTOCOL').$domain;
+      
 
-    		$full_domain=rtrim($request->full_domain, '/');
-    	}
+      $check_fulldomain=Domain::where('full_domain',$full_domain)->first();
 
-    	$check_fulldomain=Domain::where('full_domain',$full_domain)->first();
+      $check=Domain::where('domain',$domain)->first();
+      if (!empty($check)) {
+        $msg['errors']['domain']="Sorry Store Name Already Exists";
+        return response()->json($msg,422); 
+      }
 
-    	$check=Domain::where('domain',$domain)->first();
-    	if (!empty($check)) {
-    		$msg['errors']['domain']="Sorry Domain Name Already Exists";
-    		return response()->json($msg,422); 
-    	}
-
-    	if (!empty($check_fulldomain)) {
-    		$msg['errors']['domain']="Sorry Domain Name Already Exists";
-    		return response()->json($msg,422); 
-    	}
+      if (!empty($check_fulldomain)) {
+        $msg['errors']['domain']="Sorry Store Name Already Exists";
+        return response()->json($msg,422); 
+      }
 
         DB::beginTransaction();
         try {
-    	$user=new User;
-    	$user->name=$request->name;
-    	$user->email=$request->email;
-    	$user->password=Hash::make($request->password);
-    	$user->role_id=3;
-    	$user->status=3;
-    	$user->save();
+      $user=new User;
+      $user->name=$request->name;
+      $user->email=$request->email;
+      $user->password=Hash::make($request->password);
+      $user->role_id=3;
+      $user->status=env('AUTO_APPROVED_DOMAIN') == true ? 1 :  3;
+      $user->save();
 
-    	$dom=new Domain;
-    	$dom->domain=$domain;
-    	$dom->full_domain=$full_domain;
-    	$dom->status=3;
-    	$dom->user_id=$user->id;
-    	$dom->save();
+        $exp_days =  $info->days;
+        $expiry_date = \Carbon\Carbon::now()->addDays(($exp_days))->format('Y-m-d');
 
-    	$user=User::find($user->id);
-    	$user->domain_id=$dom->id;
-    	$user->save();
-        if (Auth::check()) {
-            Auth::logout();
-        }
-    	Auth::loginUsingId($user->id);
-        $auto=true;
-        if($info->price == 0){
-          $auto_order=Option::where('key','auto_order')->first(); 
-          if($auto_order->value == 'yes'){
-            $plan=$info;
-            $auto=true;
-          }
+         $max_order=Userplan::max('id');
+         $order_prefix=Option::where('key','order_prefix')->first();
 
-          $auto=false;
-          
-        }
-        else{
-          $plan=Plan::where('is_default',1)->first();  
-          $auto=false;
-        }
+
+         $order_no = $order_prefix->value.$max_order;
+
+         $userplan = new Userplan;
+         $userplan->order_no=$order_no;
+         $userplan->amount=0;
+         $userplan->tax=0;
+         $userplan->trx=Str::random(15).$max_order;
+         $userplan->will_expire=$expiry_date;
+         $userplan->user_id=$user->id;
+         $userplan->plan_id=$info->id;
+         $userplan->category_id=2;
+         $userplan->status=1;
+         $userplan->payment_status=1;
+         $userplan->save();
 
         
-        $userplan=new Userplanmeta;
-        $userplan->user_id=Auth::id();
-        if(!empty($plan)){
-            $userplan->name=$plan->name;
-            $userplan->product_limit=$plan->product_limit;
-            $userplan->storage=$plan->storage;
-            $userplan->customer_limit=$plan->customer_limit;
-            $userplan->category_limit=$plan->category_limit;
-            $userplan->location_limit=$plan->location_limit;
-            $userplan->brand_limit=$plan->brand_limit;
-            $userplan->variation_limit=$plan->variation_limit;
-        }
-        else{
-            $userplan->name='free';
-            $userplan->storage=0;
-        }
-        $userplan->save();
 
-        if($info->price == 0 || $info->price == 0.00){
-            $exp_days =  $info->days;
-            $expiry_date = \Carbon\Carbon::now()->addDays(($exp_days - 1))->format('Y-m-d');
-
-            $max_order=Userplan::max('id');
-            $order_prefix=Option::where('key','order_prefix')->first();
+      $dom=new Domain;
+      $dom->domain=$domain;
+      $dom->full_domain=$full_domain;
+      $dom->status=env('AUTO_APPROVED_DOMAIN') == true ? 1 :  3;
+      $dom->user_id=$user->id;
+        $dom->is_trial=1;
+        $dom->type=1;
+        $dom->data=$info->data;
+        $dom->will_expire=$expiry_date;
+        $dom->userplan_id=$userplan->id;
+      $dom->save();
 
 
-            $order_no = $order_prefix->value.$max_order;
+      $user=User::find($user->id);
+      $user->domain_id=$dom->id;
+      $user->save();
 
-            $transection=new Trasection;
-            $transection->category_id = 2;
-            $transection->user_id = Auth::id();
-            $transection->trasection_id = \Str::random(10);
-            $transection->status = 1;            
-            $transection->save();
-
-            $userplan=new Userplan;
-            $userplan->order_no=$order_no;
-            $userplan->amount=$info->price;
-            $userplan->user_id =Auth::id();
-            $userplan->plan_id = $info->id;
-            $userplan->trasection_id = $transection->id ?? null;
-            $userplan->will_expired=$expiry_date;
-
-            
-            if($auto == true){
-                $userplan->status=1;
-            }
-            $userplan->save();
-
-            Session::flash('success', 'Thank You For Subscribe After Review The Order You Will Get A Notification Mail From Admin');
-
-
-        }
-        else{
-            
-            if(!empty($plan)){
-                if($plan->is_default==1){
-                    $exp_days =  $plan->days ?? 5;
-                    $expiry_date = \Carbon\Carbon::now()->addDays(($exp_days - 1))->format('Y-m-d');
-
-                    $max_order=Userplan::max('id');
-                    $order_prefix=Option::where('key','order_prefix')->first();
-
-
-                    $order_no = $order_prefix->value.$max_order;
-
-                    $userplan=new Userplan;
-                    $userplan->order_no=$order_no;
-                    $userplan->amount=$plan->price;
-                    $userplan->user_id =Auth::id();
-                    $userplan->plan_id = $plan->id;
-                    $userplan->trasection_id = null;
-                    $userplan->will_expired=$expiry_date;
-
-                    $auto_order=Option::where('key','auto_order')->first();
-                    if($auto == true){
-                        $userplan->status=1;
-                    }
-                    $userplan->save();
-                }
-            }
-
+        $dom->orderlog()->create(['userplan_id'=>$userplan->id,'domain_id'=>$dom->id]);
         
-        }
 
         DB::commit();
       } catch (Exception $e) {
       DB::rollback();
      }
 
+     if ($dom->status == 1) {
+        $dta['domain']=$dom->full_domain.'/login';
+        $dta['redirect']=true;
 
-    	return response()->json(['Successfully Registered']);
-    	
+     }
+     else{
+        Auth::loginUsingId($user->id);
+        $dta['redirect']=true;
+        $dta['domain']=route('merchant.dashboard');
+     }
+       $dta['msg']='Successfully Registered';
+
+
+      return response()->json($dta);
+      
     }
 
 
     public function dashboard()
     {
-    	return view('seller.dashboard');
+      return view('seller.dashboard');
     }
 
     public function settings()
@@ -477,25 +404,37 @@ class FrontendController extends Controller
            Session::flash('success', 'Thank You For Subscribe After Review The Order You Will Get A Notification Mail From Admin');
            return redirect('merchant/plan'); 
         }
-    	$info=Plan::where('status',1)->where('is_default',0)->where('price','>',0)->findorFail($id);
-    	$getways=Category::where('type','payment_getway')->where('featured',1)->where('slug','!=','cod')->with('preview')->get();
-        $currency=\App\Option::where('key','currency_info')->first();
-        $currency=json_decode($currency->value);
-        $currency_name=$currency->currency_name;
-        $price=$currency_name.' '.$info->price;
-    	return view('seller.plan.payment',compact('info','getways','price'));
+      $info=Plan::where('status',1)->where('is_default',0)->where('is_trial',0)->where('price','>',0)->findorFail($id);
+
+      $getways=Category::where('type','payment_getway')->with('credentials')->where('featured',1)->where('slug','!=','cod')->with('preview')->get();
+
+      $tax=Option::where('key','tax')->first();
+      $tax= ($info->price / 100) * $tax->value;
+
+      $currency=Option::where('key','currency_info')->first();
+      $currency=json_decode($currency->value);
+      $currency_name=$currency->currency_name;
+      $price=$currency_name.' '.number_format($info->price+$tax,2);
+      $main_price=$info->price;
+      return view('seller.plan.payment',compact('info','getways','price','tax','main_price'));
     }
 
     public function make_charge(Request $request,$id)
     {
 
-        $info=Plan::where('status',1)->where('is_default',0)->where('price','>',0)->findorFail($id);
+        $info=Plan::where('status',1)->where('is_default',0)->where('is_trial',0)->where('price','>',0)->findorFail($id);
+
         $getway=Category::where('type','payment_getway')->where('featured',1)->where('slug','!=','cod')->findorFail($request->mode);
 
-        $currency=\App\Option::where('key','currency_info')->first();
+        $currency=Option::where('key','currency_info')->first();
         $currency=json_decode($currency->value);
         $currency_name=$currency->currency_name;
-        $total=$info->price;
+        
+
+        $tax=Option::where('key','tax')->first();
+        $tax= ($info->price / 100) * $tax->value;
+
+        $total=str_replace(',', '', number_format($info->price+$tax,2));
        
         $data['ref_id']=$id;
         $data['getway_id']=$request->mode;
@@ -544,58 +483,55 @@ class FrontendController extends Controller
 
             DB::beginTransaction();
             try {
-            $transection=new Trasection;
-            $transection->category_id = $data['getway_id'];
-            $transection->trasection_id = $data['payment_id'];
-            if (isset($data['payment_status'])) {
-                $transection->status = $data['payment_status'];
-            }
-            else{
-                $transection->status = 1;
-            }
-            $transection->save();
+            
 
             $exp_days =  $plan->days;
-            $expiry_date = \Carbon\Carbon::now()->addDays(($exp_days - 1))->format('Y-m-d');
+            $expiry_date = \Carbon\Carbon::now()->addDays($exp_days)->format('Y-m-d');
 
             $max_order=Userplan::max('id');
             $order_prefix=Option::where('key','order_prefix')->first();
             
 
             $order_no = $order_prefix->value.$max_order;
+            $tax=Option::where('key','tax')->first();
+            $tax= ($plan->price / 100) * $tax->value;
 
             $user=new Userplan;
             $user->order_no=$order_no;
             $user->amount=$data['amount'];
-            $user->user_id =Auth::id();
-            $user->plan_id = $plan->id;
-            $user->trasection_id = $transection->id;
-            $user->will_expired=$expiry_date;
-            
-            $auto_order=Option::where('key','auto_order')->first();
-             if($auto_order->value == 'yes' && $transection->status == 1){
-                $user->status=1;
-             }
-             
-            $user->save();
-           
-            if($auto_order->value == 'yes' && $transection->status == 1){
-                $meta=Userplanmeta::where('user_id',Auth::id())->first();
-                if(empty($meta)){
-                    $meta=new Userplanmeta;
-                    $meta->user_id=Auth::id();
-                }
-                $meta->name=$plan->name;
-                $meta->product_limit=$plan->product_limit;
-                $meta->storage=$plan->storage;
-                $meta->customer_limit=$plan->customer_limit;
-                $meta->category_limit=$plan->category_limit;
-                $meta->location_limit=$plan->location_limit;
-                $meta->brand_limit=$plan->brand_limit;
-                $meta->variation_limit=$plan->variation_limit;
-                $meta->save();
+            $user->tax=$tax;
+            $user->trx=$data['payment_id'];
+            $user->will_expire=$expiry_date;
+            $user->user_id=Auth::id();
+            $user->plan_id=$plan->id;
+            $user->category_id=$data['getway_id'];;
+
+
+            if (isset($data['payment_status'])) {
+              $transection->payment_status = $data['payment_status'];
+            }
+            else{
+              $user->payment_status = 1;
             }
 
+            $auto_order=Option::where('key','auto_order')->first();
+            if($auto_order->value == 'yes'  && $user->payment_status == 1){
+              $user->status=1;
+            }
+
+            $user->save();
+
+            if($auto_order->value == 'yes' && $user->status == 1){
+              $dom=Domain::where('user_id',Auth::id())->first();
+              $dom->data=$plan->data;
+              $dom->userplan_id=$user->id;
+              $dom->will_expire=$expiry_date;
+              $dom->is_trial=0;
+              $dom->save();
+
+
+              $dom->orderlog()->create(['userplan_id'=>$user->id,'domain_id'=>$dom->id]);
+            }
             Session::flash('success', 'Thank You For Subscribe After Review The Order You Will Get A Notification Mail From Admin');
 
 

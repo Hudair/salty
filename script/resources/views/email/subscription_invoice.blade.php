@@ -495,7 +495,7 @@
                              <h3>Expiry Date</h3>
                             </td>
                             <td>
-                              <h3 class="align-right">{{ $info->will_expired }}</h3>
+                              <h3 class="align-right">{{ $info->will_expire }}</h3>
                             </td>
                           </tr>
 
@@ -512,7 +512,12 @@
                              <h3>Payment Status</h3>
                             </td>
                             <td>
-                              <h3 class="align-right">@if($info->payment_method->status==1) Approved  @else Declined  @endif</h3>
+                              <h3 class="align-right">@if($info->payment_status==1) Approved
+                                @elseif($info->payment_status==2) 
+                                Pending
+                                @else 
+                                Declined  
+                                @endif</h3>
                             </td>
                           </tr>
 
@@ -532,13 +537,17 @@
                                  <td>{{ $info->plan_info->name }}</td>
                                   <td class="align-right">{{ number_format($info->amount,2) }}</td>
                                 </tr>
+                                <tr>
+                                 <td>Tax</td>
+                                  <td class="align-right">{{ number_format($info->tax,2) }}</td>
+                                </tr>
                                
                                  <tr>
                                   <td width="80%" class="purchase_footer" valign="middle">
                                     <p class="f-fallback purchase_total purchase_total--label">Payment Mode</p>
                                   </td>
                                   <td width="20%" class="purchase_footer" valign="middle">
-                                    <p class="f-fallback purchase_total">{{ $info->payment_method->method->name }}</p>
+                                    <p class="f-fallback purchase_total">{{ $info->category->name }}</p>
                                   </td>
                                 </tr>
 
@@ -550,7 +559,7 @@
                                     <p class="f-fallback purchase_total purchase_total--label">Total</p>
                                   </td>
                                   <td width="20%" class="purchase_footer" valign="middle">
-                                    <p class="f-fallback purchase_total">{{ number_format($info->amount,2) }}</p>
+                                    <p class="f-fallback purchase_total">{{ number_format($info->amount+$info->tax,2) }}</p>
                                   </td>
                                 </tr>
                               </table>

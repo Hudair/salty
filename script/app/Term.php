@@ -77,6 +77,11 @@ class Term extends Model
 		return $this->hasOne('App\Meta','term_id')->where('key','seo');
 	}
 
+    public function affiliate()
+    {
+        return $this->hasOne('App\Meta','term_id')->where('key','affiliate');
+    }
+
 
 
 	public function content()

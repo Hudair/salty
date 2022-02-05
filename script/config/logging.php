@@ -43,7 +43,7 @@ return [
 
         'single' => [
             'driver' => 'single',
-            'path' => storage_path('logs/laravel.log'),
+            'path' => null,
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
@@ -97,7 +97,7 @@ return [
         ],
 
         'emergency' => [
-            'path' => storage_path('logs/laravel.log'),
+            'path' => null,
         ],
     ],
 

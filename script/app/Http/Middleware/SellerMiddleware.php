@@ -30,7 +30,7 @@ class SellerMiddleware
           
           $url= Auth::user()->user_domain->full_domain ?? env('APP_APP_URL');
 
-          if($url != url('/')){
+          if($url != str_replace('www.', '', url('/'))){
             Auth::logout();
             return redirect()->route('login');
           }

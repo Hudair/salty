@@ -31,6 +31,8 @@ class CategoryTableSeeder extends Seeder
 
   array('id' => '9','name' => 'Paystack','slug' => 'paystack','type' => 'payment_getway','p_id' => NULL,'featured' => '0','menu_status' => '0','is_admin' => '0','created_at' => '2020-12-12 14:54:58','updated_at' => '2020-12-14 06:28:00','user_id' => '1'),
 
+  array('id' => '10','name' => 'Mercado','slug' => 'mercado','type' => 'payment_getway','p_id' => NULL,'featured' => '0','menu_status' => '0','is_admin' => '0','created_at' => '2020-12-12 14:54:58','updated_at' => '2020-12-14 06:28:00','user_id' => '1'),
+
   array('id' => '73','name' => 'James Curran','slug' => 'General Manager Spotify','type' => 'testimonial','p_id' => NULL,'featured' => '0','menu_status' => '0','is_admin' => '1','created_at' => '2020-12-18 17:36:54','updated_at' => '2020-12-18 17:36:54','user_id' => '1'),
   array('id' => '74','name' => 'Jose Evans','slug' => 'Chief Engineer Apple','type' => 'testimonial','p_id' => NULL,'featured' => '0','menu_status' => '0','is_admin' => '1','created_at' => '2020-12-18 17:37:34','updated_at' => '2020-12-18 17:37:34','user_id' => '1'),
   array('id' => '75','name' => '#','slug' => NULL,'type' => 'brand','p_id' => NULL,'featured' => '0','menu_status' => '0','is_admin' => '1','created_at' => '2020-12-18 18:02:34','updated_at' => '2020-12-18 18:02:34','user_id' => '1'),
@@ -105,7 +107,11 @@ class CategoryTableSeeder extends Seeder
   array('id' => '70','category_id' => '91','type' => 'preview','content' => 'uploads/1/2021/01/1610212859.svg','created_at' => '2021-01-09 17:20:57','updated_at' => '2021-01-09 17:20:57'),
   array('id' => '71','category_id' => '92','type' => 'preview','content' => 'uploads/1/2021/01/1610212858.svg','created_at' => '2021-01-09 17:20:57','updated_at' => '2021-01-09 17:20:57'),
    array('id' => '72','category_id' => '93','type' => 'preview','content' => 'uploads/1/2020/12/nginx-logo.svg','created_at' => '2020-12-18 18:03:14','updated_at' => '2020-12-18 18:03:14'),
-  
+    
+    array('id' => '73','category_id' => '10','type' => 'credentials','content' => '{"public_key":"","access_token":""}','created_at' => '2020-12-29 07:50:18','updated_at' => '2020-12-29 07:50:18'),
+
+  array('id' => '74','category_id' => '10','type' => 'preview','content' => 'uploads/mercado.png','created_at' => '2020-12-12 14:49:39','updated_at' => '2020-12-12 14:49:39'),
+  array('id' => '75','category_id' => '10','type' => 'description','content' => 'description','created_at' => '2020-12-12 14:49:38','updated_at' => '2020-12-12 14:49:38'),
 
 );
 

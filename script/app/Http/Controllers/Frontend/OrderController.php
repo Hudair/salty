@@ -77,8 +77,9 @@ class OrderController extends Controller
             
             return back();
            }
-           $plan=Userplanmeta::where('user_id',$user_id)->first();
-           $user_limit=$plan->customer_limit ?? 0;
+           
+           $user_limit=domain_info('customer_limit',0);
+           
            $total_customers=Customer::where('created_by',$user_id)->count();
 
            if($user_limit <= $total_customers){

@@ -18,7 +18,7 @@ class CreateMetasTable extends Migration
             $table->unsignedBigInteger('term_id');
             $table->string('key');
             $table->text('value')->nullable();
-           // $table->timestamps();
+         
             $table->foreign('term_id')
             ->references('id')->on('terms')
             ->onDelete('cascade'); 

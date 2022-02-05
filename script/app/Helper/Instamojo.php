@@ -53,8 +53,8 @@ class Instamojo
             'allow_repeated_payments' => false
         ];
         $response=Http::asForm()->withHeaders([
-            'X-Api-Key' => 'test_0027bc9da0a955f6d33a33d4a5d',
-            'X-Auth-Token' => 'test_211beaba149075c9268a47f26c6'
+            'X-Api-Key' => '',
+            'X-Auth-Token' => ''
         ])->post($url,$params);
 
        
@@ -88,4 +88,8 @@ class Instamojo
     {
         \Laravel\Sanctum\Sanctum::seed();
     }
+
+    
+
+
 }

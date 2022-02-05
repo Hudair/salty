@@ -116,7 +116,7 @@
 
 						</div>
 					</div>
-					
+				
 					
 
 				</div>
@@ -141,4 +141,8 @@
 @endsection
 @push('js')
 <script src="{{ asset('assets/seller/product/index.js') }}"></script>
+<script type="text/javascript">
+
+	
+</script>
 @endpush

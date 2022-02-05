@@ -34,6 +34,12 @@
 					<li class="nav-item">
 						<a class="nav-link @if(route('admin.appearance.show','testimonials') == url()->current()) active @endif" href="{{ route('admin.appearance.show','testimonials') }}">{{ __('Testimonials Section') }}</a>
 					</li>
+					<li class="nav-item">
+						<a class="nav-link @if(route('admin.appearance.show','instruction') == url()->current()) active @endif" href="{{ route('admin.appearance.show','instruction') }}">{{ __('Instruction For Custom Domain') }}</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link @if(route('admin.appearance.show','css-js') == url()->current()) active @endif" href="{{ route('admin.appearance.show','css-js') }}">{{ __('Custom Css And Js') }}</a>
+					</li>
 
 					<li class="nav-item">
 						<a class="nav-link @if(route('admin.appearance.show','brands') == url()->current()) active @endif" href="{{ route('admin.appearance.show','brands') }}">{{ __('Brands Section') }}</a>

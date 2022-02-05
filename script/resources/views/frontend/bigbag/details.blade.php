@@ -92,16 +92,26 @@
                                  @csrf
                              <input type="hidden" name="id" value="{{ $info->id }}">
                             <div class="single-product-widget product-quantity">
+                                @if(empty($info->affiliate))
                                 <h5>{{ __('Product Quantity') }} :</h5>
+                                @endif
                                 <ul>
+                                    @if(empty($info->affiliate))
                                     <li><input type="number" name="qty"  id="qty"  @if($info->stock->stock_manage == 1) @if($info->stock->stock_status == 0) disabled max="0" min="0" @else max="{{ $info->stock->stock_qty }}" min="1"  value="1" @endif @else min="1" max="999" value="1"  @endif></li>
-
+                                    @endif
                                     
                                     <li>
+                                        @if(empty($info->affiliate))
                                         <button type="submit"  class="btn btn-outline submit_btn"  @if($info->stock->stock_status == 0) disabled @endif>
                                             <i class="fas fa-shopping-basket"></i>
                                             <span class="submit_text"> @if($info->stock->stock_status == 0) {{ __('Out Of Stock') }} @else {{ __('Add to Cart') }} @endif</span>
                                         </button>
+                                        @else
+                                         <a href="{{ url($info->affiliate->value ?? '') }}" target="_blank"  class="btn btn-outline"  @if($info->stock->stock_status == 0) disabled @endif>
+                                            <i class="fas fa-shopping-basket"></i>
+                                            <span class="submit_text"> @if($info->stock->stock_status == 0) {{ __('Out Of Stock') }} @else {{ __('Purchase Now') }} @endif</span>
+                                        </a>
+                                        @endif
                                     </li>
                                     <li>
                                         <a href="javascript:void(0)" data-id="{{ $info->id }}" class="wishlist-icon" id="wishlist">

@@ -56,6 +56,11 @@
 						</tr>
 					</thead>
 					<tbody>
+						 @php
+		                 $plan=user_limit();
+		                 $plan=filter_var($plan['customer_panel']);
+                		
+                         @endphp
 						@foreach($posts as $row)
 						<tr id="row{{  $row->id }}">
 							<td>
@@ -87,7 +92,7 @@
                       <div class="dropdown-menu">
                         <a class="dropdown-item has-icon" href="{{ route('seller.customer.edit',$row->id) }}"><i class="fas fa-user-edit"></i> {{ __('Edit Acount') }}</a>
                         <a class="dropdown-item has-icon" href="{{ route('seller.customer.show',$row->id) }}"><i class="fas fa-search"></i> {{ __('View User') }}</a>
-                        <a class="dropdown-item has-icon" href="{{ route('seller.customer.login',$row->id) }}"><i class="fas fa-key"></i> {{ __('Login As ').$row->name }}</a>
+                        <a class="dropdown-item has-icon" @if($plan == true) href="{{ route('seller.customer.login',$row->id) }}" @endif>@if($plan !== true) <i class="fa fa-lock text-danger"></i> @else <i class="fas fa-key"></i>  @endif {{ __('Login ') }}</a>
 
                       </div>
                     </div>

@@ -7,7 +7,7 @@
 	<div class="col-12">
 		<div class="card">
 			<div class="card-header">
-				<h4>{{ __('Create Customer') }}</h4>
+				<h4>{{ __('Edit Order') }}</h4>
 
 			</div>
 			<div class="card-body">
@@ -16,18 +16,22 @@
 					@csrf
 					@method('PUT')
 
+					<div class="form-group row mb-4">
+						<label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" >{{ __('Order Id') }}</label>
+						<div class="col-sm-12 col-md-7">
+							<input type="text" class="form-control" name="order_no" value="{{ $info->order_no }}">
+						</div>
+					</div>
 
 
 
 					<div class="form-group row mb-4">
 						<label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" >{{ __('Transaction Method') }}</label>
 						<div class="col-sm-12 col-md-7">
-							<select class="form-control" name="trasection_method">
-								@php
-								$getway=$info->payment_method->method->id ?? null;
-								@endphp
+							<select class="form-control" name="category_id">
+								
 								@foreach($payment_getway as $row)
-								<option value="{{ $row->id }}" @if($getway == $row->id) selected="" @endif>{{ $row->name }}</option>
+								<option value="{{ $row->id }}" @if($info->category_id == $row->id) selected="" @endif>{{ $row->name }}</option>
 								@endforeach
 							</select>
 						</div>
@@ -36,7 +40,19 @@
 					<div class="form-group row mb-4">
 						<label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" >{{ __('Transaction Id') }}</label>
 						<div class="col-sm-12 col-md-7">
-							<input type="text" class="form-control" name="trasection_id" value="{{ $info->payment_method->trasection_id ?? '' }}">
+							<input type="text" class="form-control" name="trx" value="{{ $info->trx }}">
+						</div>
+					</div>
+					<div class="form-group row mb-4">
+						<label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" >{{ __('Amount') }}</label>
+						<div class="col-sm-12 col-md-7">
+							<input type="text" class="form-control" name="amount" value="{{ $info->amount }}">
+						</div>
+					</div>
+					<div class="form-group row mb-4">
+						<label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" >{{ __('Tax') }}</label>
+						<div class="col-sm-12 col-md-7">
+							<input type="text" class="form-control" name="tax" value="{{ $info->tax }}">
 						</div>
 					</div>
 
@@ -44,10 +60,13 @@
 						<label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" >{{ __('Payment Status') }}</label>
 						<div class="col-sm-12 col-md-7">
 							@php
-							$payment_status=$info->payment_method->status ?? null;
+							$payment_status=$info->payment_status ?? null;
 							@endphp
 							<select class="form-control" name="payment_status">
 								<option value="1" @if($payment_status==1) selected="" @endif>{{ __('Complete') }}</option>
+								
+								<option value="2" @if($payment_status==2) selected="" @endif>{{ __('Pending') }}</option>
+
 								<option value="0" @if($payment_status==0) selected="" @endif>{{ __('Decline') }}</option>
 							</select>
 						</div>
@@ -77,7 +96,18 @@
 							</select>
 						</div>
 					</div>
+					@if($info->status==2)
+					<div class="form-group row mb-4">
+						<label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" >{{ __('Apply The Subscription ?') }}</label>
+						<div class="col-sm-12 col-md-7">
 
+							<select class="form-control" name="subscription_status" id="notification_status">
+							<option value="yes">{{ __('Yes') }}</option>
+							<option value="no" selected="">{{ __('No') }}</option>
+						</select>
+						</div>
+					</div>
+					@endif
 					<div class="form-group row mb-4">
 						<label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" >{{ __('Send Email To Customer ?') }}</label>
 						<div class="col-sm-12 col-md-7">

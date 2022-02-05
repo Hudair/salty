@@ -181,6 +181,7 @@ class SettingController extends Controller
             $domain->shop_type=$request->shop_type;
             $domain->save();
             //\Cache::forget('domain');
+
             return response()->json(['Settings Updated']);
 
        }
@@ -350,6 +351,28 @@ return response()->json(['Update success']);
          
        }
 
+       if ($request->type=='css') {
+        $user_id=Auth::id();
+        $plan=user_limit();
+        if (filter_var($plan['custom_css'])==true) {
+           \File::put('uploads/'.$user_id.'/additional.css',$request->css);
+           return response()->json(['Updated success']);
+        }
+        
+
+       }
+
+       if ($request->type=='js') {
+        $user_id=Auth::id();
+         $plan=user_limit();
+        if (filter_var($plan['custom_js'])==true) {
+        \File::put('uploads/'.$user_id.'/additional.js',$request->js);
+        return response()->json(['Updated success']);
+        }
+       }
+
+       abort(404);
+
     }
 
     /**
@@ -398,19 +421,45 @@ return response()->json(['Update success']);
             $order_receive_method= Useroption::where('user_id',$user_id)->where('key','order_receive_method')->first();
             $order_receive_method= $order_receive_method->value ?? 'email';
             
-           return view('seller.settings.general',compact('shop_name','order_receive_method','shop_description','store_email','order_prefix','currency','location','theme_color','langlist','my_languages','tax','local','socials','pwa'));
+
+            if (file_exists('uploads/'.Auth::id(). '/additional.js')) {
+                $js=file_get_contents('uploads/'.Auth::id().'/additional.js');
+            }
+            else{
+                $js='';
+            }
+
+            if (file_exists('uploads/'.Auth::id(). '/additional.css')) {
+                $css=file_get_contents('uploads/'.Auth::id().'/additional.css');
+            }
+            else{
+                $css='';
+            }
+
+           return view('seller.settings.general',compact('shop_name','order_receive_method','shop_description','store_email','order_prefix','currency','location','theme_color','langlist','my_languages','tax','local','socials','pwa','js','css'));
         } 
         if ($slug=='payment') {
+            abort_if(!\Route::has('admin.plan.index'),404);
             $posts=Category::with('description','active_getway')->where('type','payment_getway')->where('slug','!=','cod')->get();
             $cod=Category::with('description','active_getway')->where('type','payment_getway')->where('slug','cod')->get();
            return view('seller.settings.payment_method',compact('posts','cod'));
         }
         if ($slug=='plan') {
-            $posts=Plan::where('status',1)->latest()->get();
-           return view('seller.plan.index',compact('posts'));
+            abort_if(!\Route::has('admin.plan.index'),404);
+            $posts=Plan::where('status',1)->where('is_default',0)->where('is_trial',0)->where('price','>',0)->latest()->get();
+            return view('seller.plan.index',compact('posts'));
         }
 
         return back();
+    }
+
+    public function support_view()
+    {
+        $plan_limit=user_limit();
+        if(filter_var($plan_limit['live_support'],FILTER_VALIDATE_BOOLEAN) != true){
+           return redirect('/seller/dashboard');
+        }
+        return view('seller.settings.support');
     }
 
    

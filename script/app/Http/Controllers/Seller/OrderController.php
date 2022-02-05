@@ -116,6 +116,15 @@ class OrderController extends Controller
      */
     public function create(Request $request)
     {
+        $plan=user_limit();
+        $google_analytics=filter_var($plan['pos']);
+            if($google_analytics == false){
+               $msg='This module did not support your subscription.';
+               \Session::flash('error',$msg);
+               return back();
+               
+        } 
+
         if (!empty($request->search)) {
           $posts=Term::with('preview','price','attributes','options','stock')->where('id',$request->search)->where('user_id',Auth::id())->where('type','product')->where('status',1)->latest()->paginate(40);
         }

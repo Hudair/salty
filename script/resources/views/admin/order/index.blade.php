@@ -83,8 +83,9 @@
 										<th class="text-left" >{{ __('Order') }}</th>
 										<th >{{ __('Date') }}</th>
 										<th>{{ __('Customer') }}</th>
-										<th class="text-right">{{ __('Order total') }}</th>
-										<th>{{ __('Payment Method') }}</th>
+										<th class="text-right">{{ __('Amount') }}</th>
+										<th class="text-right">{{ __('Tax') }}</th>
+										<th>{{ __('Method') }}</th>
 										<th>{{ __('Payment Status') }}</th>
 										<th>{{ __('Fulfillment') }}</th>
 										<th class="text-right">{{ __('Action') }}</th>
@@ -98,13 +99,15 @@
 										<td>{{ $row->created_at->format('d-F-Y') }}</td>
 										<td><a href="{{ route('admin.customer.show',$row->user->id) }}">{{ $row->user->name }}</a></td>
 										<td>{{ amount_format($row->amount) }}</td>
-										<td>{{ $row->payment_method->method->name ?? '' }}</td>
-										<td>@if(!empty($row->payment_method))
-											@if($row->payment_method->status==1)
+										<td>{{ number_format($row->tax,2) }}</td>
+										<td>{{ $row->category->name ?? '' }}</td>
+										<td>
+											@if($row->payment_status==1)
 											<span class="badge badge-success">{{ __('Paid') }}</span>
+											@elseif($row->payment_status == 2)
+											<span class="badge badge-warning">{{ __('Pending') }}</span>
 											@else
 											<span class="badge badge-danger">{{ __('Fail') }}</span>
-											@endif
 											@endif
 										</td>
 

@@ -55,7 +55,8 @@ class LoginController extends Controller
         }
         elseif (Auth::user()->role_id==2) {
            $url= Auth::user()->user_domain->full_domain;
-           if (url('/') != $url) {
+
+           if (str_replace('www.','',url('/')) != $url) {
              Auth::logout();
              return $this->redirectTo=$url.'/user/login';
            }

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\Userplan;
+use App\Models\Requestdomain;
 use Spatie\Analytics;
 use Spatie\Analytics\Period;
 use App\Domain;
@@ -31,7 +32,7 @@ class AdminController extends Controller
             ['role_id',3],
             ['status',3]
         ])->latest()->take(4)->get();
-        $orders=Userplan::with('user','plan_info','payment_method')->where('status',2)->latest()->take(20)->get();
+        $orders=Userplan::with('user','plan_info','category')->where('status',2)->latest()->take(20)->get();
 
         return view('admin.dashboard',compact('request_users','orders'));
     }
@@ -42,8 +43,9 @@ class AdminController extends Controller
         $total_domain_request=Domain::where('status',3)->count();
         $total_earnings=Userplan::where('status','!=',0)->sum('amount');
         $total_expired=Userplan::where('status',3)->count();
+        $total_custom_domain_request=Requestdomain::where('status',2)->count();
+        $total_domain_request=$total_domain_request+$total_custom_domain_request;
 
-       
         $year=Carbon::parse(date('Y'))->year;
         $today=Carbon::today();
 
@@ -132,7 +134,13 @@ class AdminController extends Controller
     public function fetchTotalVisitorsAndPageViews($period)
     {
 
-        return \Analytics::fetchTotalVisitorsAndPageViews(Period::days($period));
+        return \Analytics::fetchTotalVisitorsAndPageViews(Period::days($period))->map(function($data)
+        {
+            $row['date']=$data['date']->format('Y-m-d');
+            $row['visitors']=$data['visitors'];
+            $row['pageViews']=$data['pageViews'];
+            return $row;
+        });
         
     }
     public function fetchMostVisitedPages($period)

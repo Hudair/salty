@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Plan;
 use App\Models\User;
 use Auth;
+use Route;
 use App\Subscriber;
 class PlanController extends Controller
 {
@@ -47,25 +48,38 @@ class PlanController extends Controller
      */
     public function store(Request $request)
     {
-        if($request->is_default == 1){
-            Plan::where('is_default',1)->update(['is_default'=>0]);
-        }
+        
+        $plan_data['product_limit']=$request->product_limit;
+        $plan_data['customer_limit']=$request->customer_limit;
+        $plan_data['storage']=$request->storage;
+        $plan_data['custom_domain']=$request->custom_domain;
+        $plan_data['inventory']=$request->inventory;
+        $plan_data['pos']=$request->pos;
+        $plan_data['customer_panel']=$request->customer_panel;
+        $plan_data['pwa']=$request->pwa;
+        $plan_data['whatsapp']=$request->whatsapp;
+        $plan_data['live_support']=$request->live_support;
+        $plan_data['qr_code']=$request->qr_code;
+        $plan_data['facebook_pixel']=$request->facebook_pixel;
+        $plan_data['custom_css']=$request->custom_css;
+        $plan_data['custom_js']=$request->custom_js;
+        $plan_data['gtm']=$request->gtm;
+        $plan_data['location_limit']=$request->location_limit;
+        $plan_data['category_limit']=$request->category_limit;
+        $plan_data['brand_limit']=$request->brand_limit;
+        $plan_data['variation_limit']=$request->variation_limit;
+        $plan_data['google_analytics']=$request->google_analytics;
+        
+
         $plan=new Plan;
         $plan->name=$request->name;
         $plan->description=$request->description;
         $plan->price=$request->price;
         $plan->days=$request->days;
-        $plan->product_limit=$request->product_limit;
-        $plan->custom_domain=$request->custom_domain;
-        $plan->storage=$request->storage;
-        $plan->status=$request->status;
-        $plan->customer_limit=$request->customer_limit;
-        $plan->category_limit=$request->category_limit;
-        $plan->location_limit=$request->location_limit;
-        $plan->brand_limit=$request->brand_limit;
-        $plan->variation_limit=$request->variation_limit;
+        $plan->data=json_encode($plan_data);
+        $plan->status=$request->status; 
         $plan->featured=$request->featured;
-        $plan->is_default=$request->is_default;
+        $plan->is_default=0;
         $plan->save();
 
         return response()->json(['Plan Created']);
@@ -102,7 +116,8 @@ class PlanController extends Controller
            abort(401);
         }
         $info=Plan::find($id);
-        return view('admin.plan.edit',compact('info'));
+        $plan_info=json_decode($info->data);
+        return view('admin.plan.edit',compact('info','plan_info'));
     }
 
     /**
@@ -114,25 +129,37 @@ class PlanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if($request->is_default == 1){
-            Plan::where('is_default',1)->update(['is_default'=>0]);
-        }
+        $plan_data['product_limit']=$request->product_limit;
+        $plan_data['customer_limit']=$request->customer_limit;
+        $plan_data['storage']=$request->storage;
+        $plan_data['custom_domain']=$request->custom_domain;
+        $plan_data['inventory']=$request->inventory;
+        $plan_data['pos']=$request->pos;
+        $plan_data['customer_panel']=$request->customer_panel;
+        $plan_data['pwa']=$request->pwa;
+        $plan_data['whatsapp']=$request->whatsapp;
+        $plan_data['live_support']=$request->live_support;
+        $plan_data['qr_code']=$request->qr_code;
+        $plan_data['facebook_pixel']=$request->facebook_pixel;
+        $plan_data['custom_css']=$request->custom_css;
+        $plan_data['custom_js']=$request->custom_js;
+        $plan_data['gtm']=$request->gtm;
+        $plan_data['location_limit']=$request->location_limit;
+        $plan_data['category_limit']=$request->category_limit;
+        $plan_data['brand_limit']=$request->brand_limit;
+        $plan_data['variation_limit']=$request->variation_limit;
+        $plan_data['google_analytics']=$request->google_analytics;
+
+
         $plan=Plan::find($id);
         $plan->name=$request->name;
         $plan->description=$request->description;
         $plan->price=$request->price;
         $plan->days=$request->days;
-        $plan->product_limit=$request->product_limit;
-        $plan->custom_domain=$request->custom_domain;
-        $plan->storage=$request->storage;
-        $plan->status=$request->status;
-        $plan->customer_limit=$request->customer_limit;
-        $plan->category_limit=$request->category_limit;
-        $plan->location_limit=$request->location_limit;
-        $plan->brand_limit=$request->brand_limit;
-        $plan->variation_limit=$request->variation_limit;
+        $plan->data=json_encode($plan_data);
+        $plan->status=$request->status; 
         $plan->featured=$request->featured;
-        $plan->is_default=$request->is_default;
+        $plan->is_default=0;
         $plan->save();
 
         return response()->json(['Plan Updated']);
@@ -155,5 +182,10 @@ class PlanController extends Controller
         
        }
         return response()->json(['Category Deleted']);
+    }
+
+    public function __construct()
+    {
+        abort_if(!Route::has('admin.plan.index'),404);
     }
 }

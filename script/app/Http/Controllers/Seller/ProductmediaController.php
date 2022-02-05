@@ -67,7 +67,7 @@ class ProductmediaController extends Controller
      */
     public function store(Request $request){
        $limit=user_limit();
-       if ($limit['storage_limit'] <= str_replace(',', '', folderSize('uploads/'.Auth::id()))) {
+       if ($limit['storage'] <= str_replace(',', '', folderSize('uploads/'.Auth::id()))) {
           return response()->json('Maximum storage limit exceeded',401);
         }
      request()->validate([

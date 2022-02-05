@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Plan;
 use App\Category;
+use App\Domain;
 use App\Option;
 use App\Helper\Subscription\Paypal;
 use App\Helper\Subscription\Toyyibpay;
@@ -26,25 +27,43 @@ class PlanController extends Controller
 {
 	public function make_payment($id)
 	{
-		$info=Plan::where('status',1)->where('is_default',0)->where('price','>',0)->findorFail($id);
+		$info=Plan::where('status',1)->where('is_default',0)->where('is_trial',0)->where('price','>',0)->findorFail($id);
+
 		$getways=Category::where('type','payment_getway')->with('credentials')->where('featured',1)->where('slug','!=','cod')->with('preview')->get();
+
+		$tax=Option::where('key','tax')->first();
+		$tax= ($info->price / 100) * $tax->value;
+
 		$currency=Option::where('key','currency_info')->first();
 		$currency=json_decode($currency->value);
 		$currency_name=$currency->currency_name;
-		$price=$currency_name.' '.$info->price;
-		return view('seller.plan.payment',compact('info','getways','price'));
+		$price=$currency_name.' '.number_format($info->price+$tax,2);
+		$main_price=$info->price;
+		return view('seller.plan.payment',compact('info','getways','price','tax','main_price'));
+	}
+
+	public function renew()
+	{
+		
+		return redirect('seller/make-payment/'.Auth::user()->user_plan->plan_id);
 	}
 
 	public function make_charge(Request $request,$id)
 	{
-		
-		$info=Plan::where('status',1)->where('is_default',0)->where('price','>',0)->findorFail($id);
+
+		$info=Plan::where('status',1)->where('is_default',0)->where('is_trial',0)->where('price','>',0)->findorFail($id);
+
 		$getway=Category::where('type','payment_getway')->where('featured',1)->where('slug','!=','cod')->findorFail($request->mode);
 
 		$currency=Option::where('key','currency_info')->first();
 		$currency=json_decode($currency->value);
 		$currency_name=$currency->currency_name;
-		$total=$info->price;
+		
+
+		$tax=Option::where('key','tax')->first();
+		$tax= ($info->price / 100) * $tax->value;
+
+		$total=str_replace(',', '', number_format($info->price+$tax,2));
 
 		$data['ref_id']=$id;
 		$data['getway_id']=$request->mode;
@@ -95,57 +114,56 @@ class PlanController extends Controller
 			$plan=Plan::findorFail($data['ref_id']);
 			DB::beginTransaction();
 			try {
-			$transection=new Trasection;
-			$transection->category_id = $data['getway_id'];
-			$transection->trasection_id = $data['payment_id'];
-			if (isset($data['payment_status'])) {
-                $transection->status = $data['payment_status'];
-            }
-            else{
-                $transection->status = 1;
-            }
-			$transection->save();
+			
 			
 			$exp_days =  $plan->days;
-			$expiry_date = \Carbon\Carbon::now()->addDays(($exp_days - 1))->format('Y-m-d');
+			$expiry_date = \Carbon\Carbon::now()->addDays(($exp_days))->format('Y-m-d');
 
 			$max_order=Userplan::max('id');
 			$order_prefix=Option::where('key','order_prefix')->first();
+			$tax=Option::where('key','tax')->first();
+			$tax= ($plan->price / 100) * $tax->value;
 
 			$order_no = $order_prefix->value.$max_order;
 
 			$user=new Userplan;
 			$user->order_no=$order_no;
 			$user->amount=$data['amount'];
-			$user->user_id =Auth::id();
-			$user->plan_id = $plan->id;
-			$user->trasection_id = $transection->id;
-			$user->will_expired=$expiry_date;
+			$user->tax=$tax;
+			$user->trx=$data['payment_id'];
+			$user->will_expire=$expiry_date;
+			$user->user_id=Auth::id();
+			$user->plan_id=$plan->id;
+			$user->category_id=$data['getway_id'];;
 			
 
+			if (isset($data['payment_status'])) {
+                $transection->payment_status = $data['payment_status'];
+            }
+            else{
+                $user->payment_status = 1;
+            }
+
 			$auto_order=Option::where('key','auto_order')->first();
-             if($auto_order->value == 'yes'  && $transection->status == 1){
+             if($auto_order->value == 'yes'  && $user->payment_status == 1){
                 $user->status=1;
              }
              
             $user->save();
            
-            if($auto_order->value == 'yes' && $transection->status == 1){
-                $meta=Userplanmeta::where('user_id',Auth::id())->first();
-                if(empty($meta)){
-                    $meta=new Userplanmeta;
-                    $meta->user_id=Auth::id();
-                }
-                $meta->name=$plan->name;
-                $meta->product_limit=$plan->product_limit;
-                $meta->storage=$plan->storage;
-                $meta->customer_limit=$plan->customer_limit;
-                $meta->category_limit=$plan->category_limit;
-                $meta->location_limit=$plan->location_limit;
-                $meta->brand_limit=$plan->brand_limit;
-                $meta->variation_limit=$plan->variation_limit;
-                $meta->save();
+            if($auto_order->value == 'yes' && $user->status == 1){
+                $dom=Domain::where('user_id',Auth::id())->first();
+                $dom->data=$plan->data;
+                $dom->userplan_id=$user->id;
+                $dom->will_expire=$expiry_date;
+                $dom->is_trial=0;
+                $dom->save();
+                
+
+                $dom->orderlog()->create(['userplan_id'=>$user->id,'domain_id'=>$dom->id]);
             }
+
+           
 
 			Session::flash('success', 'Thank You For Subscribe After Review The Order You Will Get A Notification Mail From Admin');
 

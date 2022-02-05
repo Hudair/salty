@@ -96,7 +96,21 @@
 									
 								</select>
 							</div>
+							
+							<div class="form-group">
 
+								<label>
+									<input type="checkbox" @if(!empty($info->affiliate)) checked @endif name="affiliate" id="affiliate"  class="custom-switch-input sm" value="1">
+									<span class="custom-switch-indicator"></span>
+									{{ __('External Product') }}
+								</label>
+
+							</div>
+							<div class="form-group order_link  @if(empty($info->affiliate)) none @endif" >
+								<label>{{ __('Order Link') }}</label>
+								<input type="text"  class="form-control" id="purchase_link" value="{{ $info->affiliate->value ?? '' }}"  name="purchase_link" >
+							</div>
+							
 
 
 							<div class="form-group">
@@ -127,4 +141,15 @@
 <script src="{{ asset('assets/js/select2.min.js') }}"></script>
 <script src="{{ asset('assets/js/ckeditor/ckeditor.js') }}"></script>
 <script src="{{ asset('assets/js/form.js?v=1.0') }}"></script>
+<script type="text/javascript">
+	$('#affiliate').on('change',function(){
+		if(this.checked) {
+          $('.order_link').show();
+        }
+        else{
+        	$('.order_link').hide();
+        }
+		
+	});
+</script>
 @endpush

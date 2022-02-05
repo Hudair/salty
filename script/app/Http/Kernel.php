@@ -7,6 +7,9 @@ use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\AuthorMiddleware;
 use App\Http\Middleware\SellerMiddleware;
 use App\Http\Middleware\CustomerMiddleware;
+use App\Http\Middleware\Subdomain;
+use App\Http\Middleware\Customdomain;
+use App\Http\Middleware\Domain;
 class Kernel extends HttpKernel
 {
     /**
@@ -68,6 +71,9 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'domain' => Domain::class,
+        'subdomain' => Subdomain::class,
+        'customdomain' => Customdomain::class,
         'admin' => AdminMiddleware::class,
         'author' => AuthorMiddleware::class,
         'seller' => SellerMiddleware::class,

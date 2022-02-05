@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Database\Seeders\UserTableSeeder;
 use Database\Seeders\CategoryTableSeeder;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -17,7 +18,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
              UserTableSeeder::class,
              CategoryTableSeeder::class,
+           
         ]);
-        //$this->call(Database\Seeders\CategoryTableSeeder::class);
+      
     }
 }

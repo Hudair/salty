@@ -27,7 +27,11 @@
 		@endif
 		
 	</div>
+
 	@foreach($posts as $row)
+	 @php
+	 $data=json_decode($row->data);
+	 @endphp
 	<div class="col-12 col-md-4 col-lg-4">
 		<div class="pricing @if($row->featured==1) pricing-highlight @endif">
 			<div class="pricing-title">
@@ -42,33 +46,33 @@
 				<div class="pricing-details">
 					<div class="pricing-item">
 						
-						<div class="pricing-item-label">{{ __('Products Limit') }} {{ $row->product_limit }}</div>
+						<div class="pricing-item-label">{{ __('Products Limit') }} {{ $data->product_limit }}</div>
 					</div>
 					<div class="pricing-item">
 						
-						<div class="pricing-item-label">{{ __('Storage Limit') }} {{ number_format($row->storage) }}MB</div>
+						<div class="pricing-item-label">{{ __('Storage Limit') }} {{ number_format($data->storage) }}MB</div>
 					</div>
 					@if(env('MULTILEVEL_CUSTOMER_REGISTER') == true)
 					<div class="pricing-item">						
-						<div class="pricing-item-label">{{ __('Customer Limit') }} {{ number_format($row->customer_limit) }}</div>
+						<div class="pricing-item-label">{{ __('Customer Limit') }} {{ number_format($data->customer_limit) }}</div>
 					</div>
 					@endif
 					<div class="pricing-item">						
-						<div class="pricing-item-label">{{ __('Shipping Zone Limit') }} {{ number_format($row->location_limit) }}</div>
+						<div class="pricing-item-label">{{ __('Shipping Zone Limit') }} {{ $data->location_limit ?? '' }}</div>
 					</div>
 					<div class="pricing-item">						
-						<div class="pricing-item-label">{{ __('Category Limit') }} {{ number_format($row->category_limit) }}</div>
+						<div class="pricing-item-label">{{ __('Category Limit') }} {{ $data->category_limit ?? '' }}</div>
 					</div>
 					<div class="pricing-item">						
-						<div class="pricing-item-label">{{ __('Brand Limit') }} {{ number_format($row->brand_limit) }}</div>
+						<div class="pricing-item-label">{{ __('Brand Limit') }} {{ $data->brand_limit ?? '' }}</div>
 					</div>
 					<div class="pricing-item">						
-						<div class="pricing-item-label">{{ __('Product Variation Limit') }} {{ number_format($row->variation_limit) }}</div>
+						<div class="pricing-item-label">{{ __('Product Variation Limit') }} {{ $data->variation_limit ?? '' }}</div>
 					</div>
 
 					<div class="pricing-item">
 						<div class="pricing-item-label text-left">{{ __('Use your own domain') }} &nbsp&nbsp</div>
-						@if($row->custom_domain == 1)
+						@if($data->custom_domain == 'true' || $data->custom_domain == true)
 						<div class="pricing-item-icon "><i class="fas fa-check"></i></div>
 						@else
 						<div class="pricing-item-icon  bg-danger text-white"><i class="fas fa-times"></i></div>
@@ -78,43 +82,75 @@
 					<div class="pricing-item">
 						<div class="pricing-item-label text-left">{{ __('Google Analytics') }} &nbsp&nbsp</div>
 						
-						<div class="pricing-item-icon "><i class="fas fa-check"></i></div>
+						<div class="pricing-item-icon {{ filter_var($data->google_analytics,FILTER_VALIDATE_BOOLEAN) ==  false ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->google_analytics == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
 						
 					</div>
 					
 					<div class="pricing-item">
 						<div class="pricing-item-label text-left">{{ __('Facebook Pixel') }} &nbsp&nbsp</div>
 						
-						<div class="pricing-item-icon "><i class="fas fa-check"></i></div>
+						<div class="pricing-item-icon {{ $data->facebook_pixel == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->facebook_pixel == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
 						
 					</div>
 					
 					<div class="pricing-item">
 						<div class="pricing-item-label text-left">{{ __('Google Tag Manager') }} &nbsp&nbsp</div>
 						
-						<div class="pricing-item-icon "><i class="fas fa-check"></i></div>
+						<div class="pricing-item-icon {{ $data->gtm == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->gtm == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
 						
 					</div>
 					
 					<div class="pricing-item">
 						<div class="pricing-item-label text-left">{{ __('Whatsapp Plugin') }} &nbsp&nbsp</div>
 						
-						<div class="pricing-item-icon "><i class="fas fa-check"></i></div>
+						<div class="pricing-item-icon {{ $data->whatsapp == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->whatsapp == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
 						
 					</div>
 					
 					<div class="pricing-item">
-						<div class="pricing-item-label">{{ __('Inventory Management') }}</div>
+						<div class="pricing-item-label">{{ __('Inventory Management') }} &nbsp&nbsp</div>
+
+						<div class="pricing-item-icon {{ $data->inventory == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->inventory == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
+					</div>
+					<div class="pricing-item">
+						<div class="pricing-item-label">{{ __('POS') }} &nbsp&nbsp</div>
+
+						<div class="pricing-item-icon {{ $data->pos == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->pos == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
+					</div>
+					<div class="pricing-item">
+						<div class="pricing-item-label">{{ __('PWA') }} &nbsp&nbsp</div>
+						<div class="pricing-item-icon {{ $data->pwa == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->pwa == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
+					</div>
+					<div class="pricing-item">
+						<div class="pricing-item-label">{{ __('QRCODE') }} &nbsp&nbsp</div>
+						<div class="pricing-item-icon {{ $data->qr_code == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->qr_code == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
+					</div>
+					<div class="pricing-item">
+						<div class="pricing-item-label">{{ __('Custom Js') }} &nbsp&nbsp</div>
+						<div class="pricing-item-icon {{ $data->custom_js == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->custom_js == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
+					</div>
+					<div class="pricing-item">
+						<div class="pricing-item-label">{{ __('Custom Css') }} &nbsp&nbsp</div>
+						<div class="pricing-item-icon {{ $data->custom_css == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->custom_css == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
+					</div>
+					<div class="pricing-item">
+						<div class="pricing-item-label">{{ __('Seller Support') }} &nbsp&nbsp</div>
+						<div class="pricing-item-icon {{ $data->live_support == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->live_support == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
+					</div>
+					<div class="pricing-item">
+						<div class="pricing-item-label">{{ __('Customer Panel Access') }} &nbsp&nbsp</div>
+						<div class="pricing-item-icon {{ $data->customer_panel == 'false' ? 'bg-danger text-white' : ''  }} "><i class="{{ $data->customer_panel == 'false' ? 'fas fa-times' : 'fas fa-check'  }}"></i></div>
 					</div>
 					
+					
+					
 					<div class="pricing-item">
-						<div class="pricing-item-label">{{ __('Sitemap') }}</div>
+						<div class="pricing-item-label">{{ __('Multi Language') }} &nbsp&nbsp</div>
+						<div class="pricing-item-icon"><i class="fas fa-check"></i></div>
 					</div>
 					<div class="pricing-item">
-						<div class="pricing-item-label">{{ __('Multi Language') }}</div>
-					</div>
-					<div class="pricing-item">
-						<div class="pricing-item-label">{{ __('Image Optimization') }}</div>
+						<div class="pricing-item-label">{{ __('Image Optimization') }} &nbsp&nbsp</div>
+						<div class="pricing-item-icon"><i class="fas fa-check"></i></div>
 					</div>
 					
 				</div>
@@ -139,7 +175,7 @@
 	</div>
 	<div class="card-body">
 		@php
-		$posts=\App\Models\Userplan::with('plan_info','payment_method')->where('user_id',Auth::id())->latest()->paginate(20);
+		$posts=\App\Models\Userplan::with('plan','category')->where('user_id',Auth::id())->where('amount','>',0)->latest()->paginate(20);
 		@endphp
 	
 	<div class="table-responsive">
@@ -154,6 +190,7 @@
 					<th >{{ __('Expiry date') }}</th>
 					
 					<th>{{ __('Total') }}</th>
+					<th>{{ __('Tax') }}</th>
 					<th>{{ __('Payment Method') }}</th>
 					<th>{{ __('Payment Status') }}</th>
 					<th>{{ __('Fulfillment') }}</th>
@@ -167,17 +204,21 @@
 					<td class="text-left">{{ $row->order_no }}</td>
 					<td>{{ $row->plan_info->name ?? '' }}</td>
 					<td>{{ $row->created_at->format('Y-m-d') }}</td>
-					<td>{{ $row->will_expired }}</td>
+					<td>{{ $row->will_expire }}</td>
 
 					<td>{{ amount_admin_format($row->amount,2) }}</td>
-					<td>{{ $row->payment_method->method->name ?? '' }}</td>
-					<td>@if(!empty($row->payment_method))
-						@if($row->payment_method->status==1)
+					<td>{{ amount_admin_format($row->tax,2) }}</td>
+					<td>{{ $row->category->name ?? '' }}</td>
+					<td>
+						@if($row->payment_status==1)
 						<span class="badge badge-success">{{ __('Paid') }}</span>
+						
+						@elseif($row->payment_status==2)
+						<span class="badge badge-warning">{{ __('Pending') }}</span>
 						@else
 						<span class="badge badge-danger">{{ __('Fail') }}</span>
 						@endif
-						@endif
+						
 					</td>
 
 					<td>

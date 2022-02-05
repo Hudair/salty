@@ -138,6 +138,20 @@
 
             @endif
 
+            @if($info->slug=='mercado')
+            <div class="form-group">
+              <label>Public Key</label>
+              <input class="form-control" required="" value="{{ $credentials->public_key ?? '' }}" name="public_key" required="" type="text">
+            </div>
+            <div class="form-group">
+              <label>Access Token</label>
+              <input class="form-control" required="" value="{{ $credentials->access_token ?? '' }}" name="access_token" required="" type="text">
+            </div>
+
+            
+
+            @endif
+
 
 
             <div class="form-group">

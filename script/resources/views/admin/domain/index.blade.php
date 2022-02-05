@@ -100,7 +100,7 @@
 
                   <td><a href="{{ $row->full_domain }}" target="_blank">{{ $row->domain }}</a></td>
                   <td><a href="{{ $row->full_domain }}" target="_blank">{{ $row->full_domain }}</a></td>
-                  <td><a href="{{ route('admin.customer.show',$row->user->id) }}">{{ $row->user->name }}</a></td>
+                  <td><a @if(Route::has('admin.customer.index')) href="{{ route('admin.customer.show',$row->user->id) }}" @endif>{{ $row->user->name }}</a></td>
                   <td>
                     @if($row->status==1) <span class="badge badge-success">{{ __('Active') }}</span>
                     @elseif($row->status==0) <span class="badge badge-danger">{{ __('Trash') }}</span>

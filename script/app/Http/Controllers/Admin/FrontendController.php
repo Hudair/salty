@@ -138,6 +138,11 @@ class FrontendController extends Controller
 
             return response()->json(['Brand Created']);
         }
+
+        if ($request->type=="support") {
+
+
+        }    
     }
 
     /**
@@ -204,6 +209,37 @@ class FrontendController extends Controller
         if ($type=="contact") {
             return view('admin.frontend.contact');
         }
+
+        if ($type == 'instruction') {
+        
+         $option=Option::where('key','instruction')->first();
+         $info=json_decode($option->value ?? '');
+         return view('admin.frontend.instruction',compact('info','type'));
+        }
+
+        if ($type == 'css-js') {
+        
+          if (file_exists('uploads/support.js')) {
+            $support=file_get_contents('uploads/support.js');
+          }
+          else{
+            $support='';
+          }
+
+          if (file_exists('uploads/additional.js')) {
+            $additional_js=file_get_contents('uploads/additional.js');
+          }
+          else{
+            $additional_js='';
+          }
+          if (file_exists('uploads/additional.css')) {
+            $additional_css=file_get_contents('uploads/additional.css');
+          }
+          else{
+            $additional_css='';
+          }
+         return view('admin.frontend.script',compact('support','additional_js','additional_css','type'));
+        }
         
     }
 
@@ -217,6 +253,30 @@ class FrontendController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        if ($id=='instruction') {
+            $option=Option::where('key',$id)->first();
+            $info=json_decode($option->value ?? '');
+            if (empty($option)) {
+                $option=new Option;
+                $option->key=$id;
+            }
+
+            $data['dns_configure_instruction']=$request->dns_configure_instruction;
+            $data['support_instruction']=$request->support_instruction;
+            $option->value=json_encode($data);
+            $option->save();
+            return response()->json(['Update Success']);
+        }
+
+        if ($id=='css-js') {
+            
+             \File::put('uploads/additional.css',$request->additional_css);
+             \File::put('uploads/additional.js',$request->additional_js);
+             \File::put('uploads/support.js',$request->support_js);
+
+            return response()->json(['Update Success']);
+        }
         if ($id=="header") {
             $validatedData = $request->validate([
                 'file' => 'image|max:1000',

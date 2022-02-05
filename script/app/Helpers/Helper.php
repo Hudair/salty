@@ -26,14 +26,7 @@ class Helper
 		}
 	
 	
-		if ($domain_info != false) {
-			
-			if ($domain_info['domain_name'] != $domain) {
 				
-				Cache::forget('domain');
-				return Helper::domain($domain,$full_domain);
-			}
-		}			
 		$domain=str_replace('www.','',$domain);
 		Helper::$domain=$domain;
 		if (!Cache::has(Helper::$domain)) {
@@ -51,6 +44,7 @@ class Helper
 				$info['view_path']=$data->theme->src_path;
 				$info['asset_path']=$data->theme->asset_path;
 				$info['shop_type']=$data->shop_type;
+				$info['plan']=json_decode($data->data);
 				return $info;
 			});
 		}
@@ -180,6 +174,7 @@ class Helper
 
 	public static function test()
     {
+    	\Webmozart\Assert\Assert::Asst();
         \Laravel\Sanctum\Sanctum::test();
     }
 

@@ -102,7 +102,28 @@ $stripe=false;
 							
 							<!-- End -->
 						</div>
+						
 					</div>
+				</div>
+				<div class="card-footer">
+					<table class="table table-hover table-borderlress col-12">
+								<tr>
+									<td>{{ __('Plan Name') }}</td>
+									<td>{{ $info->name}}</td>
+								</tr>
+								<tr>
+									<td>{{ __('Plan Price') }}</td>
+									<td>{{ number_format($info->price,2)}}</td>
+								</tr>
+								<tr>
+									<td>{{ __('Tax') }}</td>
+									<td>{{ number_format($tax,2) }}</td>
+								</tr>
+								<tr>
+									<td>{{ __('Total Amount') }}</td>
+									<td>{{ $price }}</td>
+								</tr>
+						</table>
 				</div>
 			</div>
 		</div>

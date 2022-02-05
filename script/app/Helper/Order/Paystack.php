@@ -131,4 +131,9 @@ class Paystack
 
   }
 
+  public function __construct()
+  {
+    abort_if(!\Route::has('admin.plan.index'),404);
+  }
+
 }    

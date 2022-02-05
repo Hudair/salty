@@ -40,7 +40,7 @@
                   <th>{{ __('Duration') }}</th>
                   <th>{{ __('Users') }}</th>
                   <th>{{ __('Featured') }}</th>
-                  <th>{{ __('Is Deafult') }}</th>
+                  <th>{{ __('Is Trial') }}</th>
                   <th>{{ __('Created at') }}</th>
                   <th>{{ __('Action') }}</th>
                 </tr>
@@ -48,14 +48,15 @@
               <tbody>
                 @foreach($posts as $row)
                 <tr id="row{{ $row->id }}">
-                  <td><input type="checkbox" name="ids[]" value="{{ $row->id }}"></td>
+
+                  <td>@if($row->id !== 1 && $row->active_users_count == 0) <input type="checkbox" name="ids[]" value="{{ $row->id }}"> @endif</td>
 
                   <td>{{ $row->name  }}</td>
                   <td>{{ $row->price  }}</td>
                   <td>@if($row->days == 365) Yearly @elseif($row->days == 30) Monthly @else {{ $row->days }}  Days @endif</td>
                   <td>{{ $row->active_users_count  }}</td>
                   <td>@if($row->featured==1) <span class="badge badge-success  badge-sm">Yes</span> @else <span class="badge badge-danger  badge-sm">No</span> @endif</td>
-                  <td>@if($row->is_default==1) <span class="badge badge-success  badge-sm">Yes</span> @else <span class="badge badge-danger  badge-sm">No</span> @endif</td>
+                  <td>@if($row->is_trial==1) <span class="badge badge-success  badge-sm">Yes</span> @else <span class="badge badge-danger  badge-sm">No</span> @endif</td>
                   <td>{{ $row->created_at->diffforHumans()  }}</td>
                   <td>
                     @can('plan.edit')

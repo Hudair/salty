@@ -15,6 +15,13 @@ class InventoryController extends Controller
      */
     public function index(Request $request)
     {
+      $plan=user_limit();
+      $plan=filter_var($plan['inventory']);
+            if($plan == false){
+               return back();
+               
+      } 
+
         if (!empty($request->src)) {
             $posts=Stock::where('sku','LIKE','%'.$request->src.'%')->whereHas('term',function($q){
             	return $q->where('user_id',Auth::id());

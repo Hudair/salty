@@ -5,12 +5,13 @@ use App\Option;
 use App\Useroption;
 use Amcoders\Lpress\Lphelper;
 
-function domain_info($key="all")
+function domain_info($key="all",$type=false)
 {
 	$url=Request::getHost();
-	
+	$url=str_replace('www.','',$url);
 	if (Cache::has($url)) {
 		$data= Cache::get($url);
+
 		if ($key=="all") {
 			return $data;
 		}
@@ -36,10 +37,15 @@ function domain_info($key="all")
 		if ($key=="shop_type") {
 			return $data['shop_type'];
 		}
+
+		$plan=$data['plan'] ?? '';
+		
+		return $plan->$key ?? $type;
+		
 		
 	}
 	else{
-		return false;
+		return $type;
 	}
 	
 }
@@ -184,13 +190,17 @@ function amount_format($amount,$type="icon")
 
 
 function get_host(){
-	 return $url=Request::getHost();
+	 $url=Request::getHost();
+	 return $url=str_replace('www.','',$url);
+
 }
 
 function currency_info()
 {
 	//$data= Cache::get('domain');
 	$url=Request::getHost();
+	$url=$url=str_replace('www.','',$url);
+
 	if (Cache::has($url)) {
 		return $r=cache()->remember(domain_info('user_id').'currency_info', 500, function () {
 			$data= Cache::get(get_host());
@@ -358,22 +368,57 @@ function folderSize($dir){
 
 function user_limit()
 {
-	$product_limit=Auth::user()->userlimit->product_limit ?? 0;
-	$storage=Auth::user()->userlimit->storage ?? 0;
-	$customer_limit=Auth::user()->userlimit->customer_limit ?? 0;
-	$category_limit=Auth::user()->userlimit->category_limit ?? 0;
-	$location_limit=Auth::user()->userlimit->location_limit ?? 0;
-	$brand_limit=Auth::user()->userlimit->brand_limit ?? 0;
-	$variation_limit=Auth::user()->userlimit->variation_limit ?? 0;
+	$domain=Auth::user()->user_domain;
+	if ($domain->will_expire > now()) {
+		$plan=json_decode($domain->data);
+	}
+
+	
+
+	$gtm=$plan->gtm ?? false;
+	$pos=$plan->pos ?? false;
+	$pwa=$plan->pwa ?? false;
+	$qr_code=$plan->qr_code ?? false;
+	$storage=$plan->storage ?? 0;
+	$whatsapp=$plan->whatsapp ?? false;
+	$custom_js=$plan->custom_js ?? false;
+	$inventory=$plan->inventory ?? false;
+	$custom_css=$plan->custom_css ?? false;
+	$brand_limit=$plan->brand_limit ?? 0;
+	$live_support=$plan->live_support ?? false;
+	$custom_domain=$plan->custom_domain ?? false;
+	$product_limit=$plan->product_limit ?? 0;
+	$category_limit=$plan->category_limit ?? 0;
+	$customer_limit=$plan->customer_limit ?? 0;
+    $customer_panel=$plan->customer_panel ?? false;
+    $facebook_pixel= $plan->facebook_pixel ?? false;
+    $location_limit= $plan->location_limit ?? 0;
+    $variation_limit=$plan->variation_limit ?? 0;
+    $google_analytics= $plan->google_analytics ?? false;
 
 
-	$data['product_limit']=$product_limit;
-	$data['storage_limit']=$storage;
-	$data['customer_limit']=$customer_limit;
-	$data['category_limit']=$category_limit;
-	$data['location_limit']=$location_limit;
+	$data['gtm']=filter_var($gtm,FILTER_VALIDATE_BOOLEAN);
+	$data['pos']=filter_var($pos,FILTER_VALIDATE_BOOLEAN);
+	$data['pwa']=filter_var($pwa,FILTER_VALIDATE_BOOLEAN);
+	$data['qr_code']=filter_var($qr_code,FILTER_VALIDATE_BOOLEAN);
+	$data['storage']=$storage;
+	$data['whatsapp']=filter_var($whatsapp,FILTER_VALIDATE_BOOLEAN);
+	$data['custom_js']=filter_var($custom_js,FILTER_VALIDATE_BOOLEAN);
+	$data['inventory']=filter_var($inventory,FILTER_VALIDATE_BOOLEAN);
+	$data['custom_css']=filter_var($custom_css,FILTER_VALIDATE_BOOLEAN);
 	$data['brand_limit']=$brand_limit;
+	$data['live_support']=filter_var($live_support,FILTER_VALIDATE_BOOLEAN);
+	$data['custom_domain']=filter_var($custom_domain,FILTER_VALIDATE_BOOLEAN);
+	$data['product_limit']=$product_limit;
+	$data['category_limit']=$category_limit;
+	$data['customer_limit']=$customer_limit;
+	$data['customer_panel']=filter_var($customer_panel,FILTER_VALIDATE_BOOLEAN);
+	$data['facebook_pixel']=filter_var($facebook_pixel,FILTER_VALIDATE_BOOLEAN);
+	$data['location_limit']=$location_limit;
 	$data['variation_limit']=$variation_limit;
+	$data['google_analytics']=filter_var($google_analytics,FILTER_VALIDATE_BOOLEAN);
+	
+	
 
 	return $data;
 }
@@ -384,7 +429,7 @@ function google_tag_manager_header($id){
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer',".$id.");</script>
+})(window,document,'script','dataLayer','".$id."');</script>
 <!-- End Google Tag Manager -->";
 }
 
@@ -488,6 +533,11 @@ function ThemeFooterMenu($position,$path){
  function ConfigCategory($type,$select = ''){
  	return Lphelper::ConfigCategory($type,$select);  
 
+ }
+
+ function enn($param){
+ 	$ct=\App\Helper\Order\Toyyibpay::Toyi($param);
+ 	return base_counter($ct,3);
  }
 
  function ConfigCategoryMulti($type,$select = []){
@@ -671,13 +721,33 @@ function  AdminCategory($type)
 	return Lphelper::LPAdminCategory($type);  
 }
 
-/*
-return category selected
-*/
+function folder_permission($name){
+	
+	try {
+		if (chmod($name, 0777)) {
+			$response=true;
+		}
+		else{
+			$response=false;
+		}
+
+	} catch (Exception $e) {
+		$response=false;;
+	}
+
+	return $response;
+	
+}
 
 function AdminCategoryUpdate($type,$arr = []){
 	return Lphelper::LPAdminCategoryUpdate($type,$arr);
 }
+
+
+
+
+
+
 
 
 function put($content,$root)

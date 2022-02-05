@@ -78,7 +78,7 @@
 										<div class="selectgroup w-100">
 											@foreach ($option->childrenCategories as $row)
 										   <label class="selectgroup-item">
-										   <input  @if($option->select_type == 1) type="checkbox" @else type="radio" @endif name="option[]" value="{{ $row->id }}" class="selectgroup-input @if($option->is_required == 1) req @endif" >
+										   <input  @if($option->select_type == 1) type="checkbox" name="option[]"  @else type="radio" name="option[{{ $key }}]" @endif  value="{{ $row->id }}" class="selectgroup-input @if($option->is_required == 1) req @endif" >
 										   <span class="selectgroup-button">{{ $row->name }}</span>
 										   </label>
 										   @endforeach

@@ -20,16 +20,30 @@
       <link rel="stylesheet" href="{{ asset('assets/frontend/plugins/slick-carousel/slick/slick.css') }}">
       <link rel="stylesheet" href="{{ asset('assets/frontend/plugins/slick-carousel/slick/slick-theme.css') }}">
 
-      <!-- Main Stylesheet -->
-      <link rel="stylesheet" href="{{ asset('assets/frontend/css/style.css') }}">
+     
 
       <!--=====================================
          CSS LINK PART START
          =======================================-->
       {{ Helper::autoload_main_site_data() }}  
+       
+        @if(Cache::has('site_info'))
+        @php
+        $site_info=Cache::get('site_info');
+        $main_color=$site_info->site_color;
+        @endphp
+        @else
+        $main_color='#223a66';
+        @endif
+        <style type="text/css">
+           :root {
+              --main-theme-color: {{ $main_color }};   
+          }
+        </style>
 
-
-
+         <!-- Main Stylesheet -->
+      <link rel="stylesheet" href="{{ asset('assets/frontend/css/style.css') }}">
+      <link rel="stylesheet" href="{{ asset('uploads/additional.css') }}">
       @stack('style')
       <!--=====================================
          CSS LINK PART END
@@ -207,6 +221,7 @@ JS LINK PART START
 <script src="{{ asset('assets/frontend/plugins/bootstrap/bootstrap.min.js') }}"></script>
 <script src="{{ asset('assets/frontend/plugins/slick-carousel/slick/slick.min.js') }}"></script>
 <script src="{{ asset('assets/frontend/js/script.js') }}"></script>
+<script src="{{ asset('uploads/additional.js') }}"></script>
 @stack('js')
 
 @if(Cache::has('marketing_tool'))

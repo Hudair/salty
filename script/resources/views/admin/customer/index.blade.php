@@ -113,7 +113,9 @@
                       <div class="dropdown-menu">
                        
                          @can('customer.edit')
-                        <a class="dropdown-item has-icon" href="{{ route('admin.customer.edit',$row->id) }}"><i class="far fa-edit"></i> {{ __('Edit') }}</a>
+                        <a class="dropdown-item has-icon" href="{{ route('admin.customer.edit',$row->id) }}"><i class="fas fa-user-edit"></i> {{ __('Edit') }}</a>
+
+                        <a class="dropdown-item has-icon" href="{{ route('admin.customer.planedit',$row->id) }}"><i class="far fa-edit"></i> {{ __('Edit Plan Info') }}</a>
                          @endcan
                           @can('customer.view')
                         <a class="dropdown-item has-icon" href="{{ route('admin.customer.show',$row->id) }}"><i class="far fa-eye"></i>{{ __('View') }}</a>

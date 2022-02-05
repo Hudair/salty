@@ -60,6 +60,12 @@ class CustomerController extends Controller
     }
 
     public function login($id){
+     $plan=user_limit();
+     $plan=filter_var($plan['customer_panel']);
+     if ($plan !== true) {
+       return back();
+     }
+
      $user=Customer::where('created_by',Auth::id())->findorFail($id);
      Auth::logout();
      Auth::guard('customer')->loginUsingId($user->id);
@@ -84,7 +90,7 @@ class CustomerController extends Controller
 
          
        $validatedData = $request->validate([
-        'email' => 'required|email|unique:users,email|max:50',
+        'email' => 'required|email|max:50',
         'name' => 'required|max:20',
         'password' => 'required|min:6',
        ]);

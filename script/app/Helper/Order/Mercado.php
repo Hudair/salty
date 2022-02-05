@@ -12,6 +12,7 @@ use App\Order;
 use App\Getway;
 use MercadoPago;
 use Carbon\Carbon;
+use Route;
 class Mercado
 {
 	
@@ -144,6 +145,11 @@ class Mercado
 			return redirect(Toyyibpay::redirect_if_payment_faild());
 		}
 
-	}	
+	}
+
+    public function __construct()
+    {
+        abort_if(!Route::has('admin.plan.index'),404);
+    }	
 
 }	

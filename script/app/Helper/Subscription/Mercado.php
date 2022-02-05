@@ -145,5 +145,9 @@ class Mercado
             return redirect(Mercado::redirect_if_payment_faild());
         }
     }
+     public function __construct()
+    {
+        abort_if(!\Route::has('admin.plan.index'),404);
+    }
 
 }

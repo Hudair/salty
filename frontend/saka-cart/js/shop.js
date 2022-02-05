@@ -191,8 +191,18 @@
     }
   
   
+
+$(document).on('click','.page-link',function() {
+   var url = $(this).data('url');
+   //console.log(url)
+   if(url != null){
+   get_data(url);
+}
   
+});
+
+
   function PaginationClicked(key){
       var url = $('.page-link-no'+key).data('url');
-      get_data(url)
+  //  get_data(url)
   }

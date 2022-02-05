@@ -47,7 +47,7 @@ class CategoryController extends Controller
          return response()->json($error,401);
         }
 
-         if ($limit['storage_limit'] <= str_replace(',', '', folderSize('uploads/'.Auth::id()))) {
+         if ($limit['storage'] <= str_replace(',', '', folderSize('uploads/'.Auth::id()))) {
          \Session::flash('error', 'Maximum storage limit exceeded');
          $error['errors']['error']='Maximum storage limit exceeded';
          return response()->json($error,401);
@@ -146,7 +146,7 @@ class CategoryController extends Controller
 
         if($request->file){
             $limit=user_limit();
-            if ($limit['storage_limit'] <= str_replace(',', '', folderSize('uploads/'.Auth::id()))) {
+            if ($limit['storage'] <= str_replace(',', '', folderSize('uploads/'.Auth::id()))) {
                \Session::flash('error', 'Maximum storage limit exceeded');
                $error['errors']['error']='Maximum storage limit exceeded';
                return response()->json($error,401);
@@ -188,7 +188,15 @@ class CategoryController extends Controller
         if ($request->type=='delete') {
             foreach ($request->ids as $key => $row) {
                 $id=base64_decode($row);
-                $category= Category::where('user_id',Auth::id())->destroy($id);
+                $category= Category::where('user_id',Auth::id())->where('id',$id)->with('preview')->first();
+                if (!empty($category->preview)) {
+                    if (!empty($category->preview->content)) {
+                        if (file_exists($category->preview->content)) {
+                            unlink($category->preview->content);
+                        }
+                    }
+                }
+                $category->delete();
             }
         }
 

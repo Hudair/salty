@@ -19,6 +19,14 @@
 							<li class="nav-item">
 								<a class="nav-link" id="contact-tab4" data-toggle="tab" href="#mail_configuration" role="tab" aria-controls="driver" aria-selected="false">{{ __('Mail Configuration') }}</a>
 							</li>
+						
+							<li class="nav-item">
+								<a class="nav-link" id="contact-tab4" data-toggle="tab" href="#subdomain" role="tab" aria-controls="driver" aria-selected="false">{{ __('Domain Configuration') }}</a>
+							</li>
+							
+							<li class="nav-item">
+								<a class="nav-link" id="contact-tab4" data-toggle="tab" href="#recaptcha" role="tab" aria-controls="driver" aria-selected="false">{{ __('Google Recaptcha') }}</a>
+							</li>
 
 							<li class="nav-item">
 								<a class="nav-link" id="profile-tab4" data-toggle="tab" href="#profile4" role="tab" aria-controls="profile" aria-selected="false">{{ __('Channel') }}</a>
@@ -95,11 +103,11 @@
 							<div class="tab-pane fade" id="profile4" role="tabpanel" aria-labelledby="profile-tab4">
 								<div class="form-group">
 								<label>{{ __('LOG_CHANNEL') }}</label>
-								<input type="text" required="" name="LOG_CHANNEL" class="form-control" value="{{ env('LOG_CHANNEL') }}">
+								<input type="text"  name="LOG_CHANNEL" class="form-control" value="{{ env('LOG_CHANNEL') }}">
 							    </div>
 							    <div class="form-group">
 								<label>{{ __('LOG_LEVEL') }}</label>
-								<input type="text" required="" name="LOG_LEVEL" class="form-control" value="{{ env('LOG_LEVEL') }}">
+								<input type="text"  name="LOG_LEVEL" class="form-control" value="{{ env('LOG_LEVEL') }}">
 							    </div>
 							</div>
 
@@ -107,23 +115,23 @@
 
 								<div class="form-group">
 									<label>{{ __('DB_CONNECTION') }}</label>
-									<input type="text" required="" name="DB_CONNECTION" class="form-control" value="{{ env('DB_CONNECTION') }}" readonly="">
+									<input type="text"  name="DB_CONNECTION" class="form-control" value="{{ env('DB_CONNECTION') }}" readonly="">
 								</div>
 								<div class="form-group">
 									<label>{{ __('DB_HOST') }}</label>
-									<input type="text" required="" name="DB_HOST" class="form-control" value="{{ env('DB_HOST') }}" readonly="">
+									<input type="text"  name="DB_HOST" class="form-control" value="{{ env('DB_HOST') }}" readonly="">
 								</div>
 								<div class="form-group">
 									<label>{{ __('DB_PORT') }}</label>
-									<input type="text" required="" name="DB_PORT" class="form-control" value="{{ env('DB_PORT') }}" readonly="">
+									<input type="text"  name="DB_PORT" class="form-control" value="{{ env('DB_PORT') }}" readonly="">
 								</div>
 								<div class="form-group">
 									<label>{{ __('DB_DATABASE') }}</label>
-									<input type="text" required="" name="DB_DATABASE" class="form-control" value="{{ env('DB_DATABASE') }}" readonly="">
+									<input type="text"  name="DB_DATABASE" class="form-control" value="{{ env('DB_DATABASE') }}" readonly="">
 								</div>
 								<div class="form-group">
 									<label>{{ __('DB_USERNAME') }}</label>
-									<input type="text" required="" name="DB_USERNAME" class="form-control" value="{{ env('DB_USERNAME') }}" readonly="">
+									<input type="text"  name="DB_USERNAME" class="form-control" value="{{ env('DB_USERNAME') }}" readonly="">
 								</div>
 								<div class="form-group">
 									<label>{{ __('DB_PASSWORD') }}</label>
@@ -136,23 +144,23 @@
 
 								<div class="form-group">	
 									<label>{{ __('BROADCAST_DRIVER') }}</label>
-									<input type="text" required="" name="BROADCAST_DRIVER" class="form-control" value="{{ env('BROADCAST_DRIVER') }}">
+									<input type="text"  name="BROADCAST_DRIVER" class="form-control" value="{{ env('BROADCAST_DRIVER') }}">
 								</div>
 								<div class="form-group">
 									<label>{{ __('CACHE_DRIVER') }}</label>
-									<input type="text" required="" name="CACHE_DRIVER" class="form-control" value="{{ env('CACHE_DRIVER') }}">
+									<input type="text"  name="CACHE_DRIVER" class="form-control" value="{{ env('CACHE_DRIVER') }}">
 								</div>
 								<div class="form-group">
 									<label>{{ __('QUEUE_CONNECTION') }}</label>
-									<input type="text" required="" name="QUEUE_CONNECTION" class="form-control" value="{{ env('QUEUE_CONNECTION') }}">
+									<input type="text"  name="QUEUE_CONNECTION" class="form-control" value="{{ env('QUEUE_CONNECTION') }}">
 								</div>
 								<div class="form-group">
 									<label>{{ __('SESSION_DRIVER') }}</label>
-									<input type="text" required="" name="SESSION_DRIVER" class="form-control" value="{{ env('SESSION_DRIVER') }}">
+									<input type="text"  name="SESSION_DRIVER" class="form-control" value="{{ env('SESSION_DRIVER') }}">
 								</div>
 								<div class="form-group">
 									<label>{{ __('SESSION_LIFETIME') }}</label>
-									<input type="text" required="" name="SESSION_LIFETIME" class="form-control" value="{{ env('SESSION_LIFETIME') }}">
+									<input type="text"  name="SESSION_LIFETIME" class="form-control" value="{{ env('SESSION_LIFETIME') }}">
 								</div>
 								
 							</div>
@@ -160,7 +168,7 @@
 							<div class="tab-pane fade" id="redis" role="tabpanel" aria-labelledby="profile-tab4">
 								<div class="form-group">
 									<label>{{ __('REDIS_HOST') }}</label>
-									<input type="text" required=""  name="REDIS_HOST" class="form-control" value="{{ env('REDIS_HOST') }}">
+									<input type="text"   name="REDIS_HOST" class="form-control" value="{{ env('REDIS_HOST') }}">
 								</div>
 								<div class="form-group">
 									<label>{{ __('REDIS_PASSWORD') }}</label>
@@ -170,6 +178,57 @@
 									<label>{{ __('REDIS_PORT') }}</label>
 									<input type="text"  name="REDIS_PORT" class="form-control" value="{{ env('REDIS_PORT') }}">
 								</div>
+							</div>
+
+							 
+							<div class="tab-pane fade" id="subdomain" role="tabpanel" aria-labelledby="profile-tab4">
+								<h6>Domain Configuration</h6>
+								<div class="form-group">
+									<label>{{ __('Auto Approved After Register') }}</label>
+									<select name="AUTO_APPROVED_DOMAIN" class="form-control">
+										<option value="true" @if(env('AUTO_APPROVED_DOMAIN')===true) selected="" @endif>{{ __('On') }}</option>
+										<option value="false" @if(env('AUTO_APPROVED_DOMAIN')===false) selected="" @endif>{{ __('Off') }}</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<a href="https://mojodns.com/" target="_blank">{{ __('MOJODNS_AUTHORIZATION_TOKEN') }}</a>
+									<input type="text"  name="MOJODNS_AUTHORIZATION_TOKEN" class="form-control" value="{{ env('MOJODNS_AUTHORIZATION_TOKEN') }}">
+								</div>
+								<div class="form-group">
+									<label>{{ __('SERVER_IP') }}</label>
+									<input type="text"  name="SERVER_IP" class="form-control" value="{{ env('SERVER_IP') }}">
+								</div>
+								<div class="form-group">
+									<label>{{ __('CNAME_DOMAIN') }}</label>
+									<input type="text"  name="CNAME_DOMAIN" class="form-control" value="{{ env('CNAME_DOMAIN') }}">
+								</div>
+								<div class="form-group">
+									<label>{{ __('VERIFY IP') }}</label>
+									<select name="VERIFY_IP" class="form-control">
+										<option value="true" @if(env('VERIFY_IP')===true) selected="" @endif>{{ __('On') }}</option>
+										<option value="false" @if(env('VERIFY_IP')===false) selected="" @endif>{{ __('Off') }}</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label>{{ __('VERIFY CNAME') }}</label>
+									<select name="VERIFY_CNAME" class="form-control">
+										<option value="true" @if(env('VERIFY_CNAME')===true) selected="" @endif>{{ __('On') }}</option>
+										<option value="false" @if(env('VERIFY_CNAME')===false) selected="" @endif>{{ __('Off') }}</option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="tab-pane fade" id="recaptcha" role="tabpanel" aria-labelledby="profile-tab4">
+								<h6>Google Recaptcha V2</h6>
+								<div class="form-group">
+									<label>{{ __('NOCAPTCHA_SECRET') }}</label>
+									<input type="text"  name="NOCAPTCHA_SECRET" class="form-control" value="{{ env('NOCAPTCHA_SECRET') }}">
+								</div>
+								<div class="form-group">
+									<label>{{ __('NOCAPTCHA_SITEKEY') }}</label>
+									<input type="text"  name="NOCAPTCHA_SITEKEY" class="form-control" value="{{ env('NOCAPTCHA_SITEKEY') }}">
+								</div>
+								
 							</div>
 
 							<div class="tab-pane fade" id="mail_configuration" role="tabpanel" aria-labelledby="profile-tab4">

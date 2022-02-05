@@ -31,7 +31,7 @@ class CreateOrdersTable extends Migration
             $table->timestamps();
 
             $table->foreign('customer_id')
-            ->references('id')->on('users')
+            ->references('id')->on('customers')
             ->onDelete('cascade'); 
 
             $table->foreign('user_id')

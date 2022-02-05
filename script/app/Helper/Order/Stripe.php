@@ -107,5 +107,9 @@ class Stripe
 
        abort(401);
     }
+     public function __construct()
+    {
+        abort_if(!\Route::has('admin.plan.index'),404);
+    }
 
 }    

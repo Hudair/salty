@@ -18,11 +18,13 @@
         @endcan
 
         @can('order.list')
+         @if(Route::has('admin.order.index'))
        <li class="{{ Request::is('admin/order*') ? 'active' : '' }}">
           <a class="nav-link" href="{{ route('admin.order.index') }}">
            <i class="flaticon-note"></i> <span>{{ __('Orders') }}</span>
           </a>
         </li>
+        @endif
         @endcan
 
         @php
@@ -39,6 +41,7 @@
         @endphp
         @endcan
         @if($plan == true)
+        @if(Route::has('admin.plan.index'))
         <li class="dropdown {{ Request::is('admin/plan*') ? 'active' : '' }}">
           <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="flaticon-pricing"></i> <span>{{ __('Plans') }}</span></a>
           <ul class="dropdown-menu">
@@ -50,8 +53,9 @@
             @endcan
           </ul>
         </li>
-
         @endif
+        @endif
+        @if(Route::has('admin.plan.index'))
         @can('report.view')
         <li class="{{ Request::is('admin/report*') ? 'active' : '' }}">
           <a class="nav-link" href="{{ route('admin.report') }}">
@@ -59,10 +63,12 @@
           </a>
         </li>
         @endcan
+        @endif
 
+        @if(Route::has('admin.customer.index'))
         @can('customer.create','customer.list','customer.request','customer.list')
         <li class="dropdown {{ Request::is('admin/customer*') ? 'active' : '' }}">
-          <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="flaticon-customer"></i> <span>Customers</span></a>
+          <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="flaticon-customer"></i> <span>{{ __('Customers') }}</span></a>
           <ul class="dropdown-menu">
             @can('customer.create')
             <li><a class="nav-link" href="{{ route('admin.customer.create') }}">{{ __('Create Customer') }}</a></li>
@@ -79,6 +85,7 @@
           </ul>
         </li>
         @endcan
+        @endif
 
         @can('domain.create','domain.list')
          <li class="dropdown {{ Request::is('admin/domain*') ? 'active' : '' }}">
@@ -89,6 +96,10 @@
             @endcan
             @can('domain.list')
             <li><a class="nav-link {{ Request::is('admin/domain') ? 'active' : '' }}" href="{{ route('admin.domain.index') }}">{{ __('All Domains') }}</a></li>
+            @if(getenv("AUTO_APPROVED_DOMAIN") !== false)
+
+             <li><a class="nav-link {{ Request::is('admin/domain') ? 'active' : '' }}" href="{{ route('admin.customdomain.index') }}">{{ __('Custom Domains Requests') }}</a></li>
+             @endif
             @endcan
           </ul>
         </li>
@@ -101,6 +112,7 @@
           </a>
         </li>
         @endcan
+        @if(Route::has('admin.payment-geteway.index'))
         @can('payment_gateway.config')
          <li class="{{ Request::is('admin/payment-geteway*') ? 'active' : '' }}">
           <a class="nav-link" href="{{ route('admin.payment-geteway.index') }}" >
@@ -108,6 +120,7 @@
           </a>
         </li>
         @endcan
+        @endif
         @can('template.list')
         <li class="{{ Request::is('admin/template') ? 'active' : '' }}">
           <a class="nav-link" href="{{ route('admin.template.index') }}">
@@ -190,6 +203,11 @@
 
         @if(Auth::user()->role_id==3)
         
+        @php
+        $plan_limit=user_limit();
+        
+
+        @endphp
         <li class="{{ Request::is('seller/dashboard*') ? 'active' : '' }}">
           <a class="nav-link" href="{{ route('seller.dashboard') }}">
             <i class="flaticon-dashboard"></i> <span>{{ __('Dashboard') }}</span>
@@ -209,7 +227,7 @@
           <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="flaticon-box"></i> <span>{{ __('Products') }}</span></a>
           <ul class="dropdown-menu">
             <li><a class="nav-link" href="{{ route('seller.product.index') }}">{{ __('All Products') }}</a></li>
-            <li><a class="nav-link" href="{{ route('seller.inventory.index') }}">{{ __('Inventory') }}</a></li>
+            <li><a class="nav-link" @if(filter_var($plan_limit['inventory']) == true) href="{{ route('seller.inventory.index') }}" @endif>{{ __('Inventory') }} @if(filter_var($plan_limit['inventory']) != true) <i class="fa fa-lock text-danger"></i> @endif</a></li>
             <li><a class="nav-link" href="{{ route('seller.category.index') }}">{{ __('Categories') }}</a></li>
             <li><a class="nav-link" href="{{ route('seller.attribute.index') }}">{{ __('Attributes') }}</a></li>
             <li><a class="nav-link" href="{{ route('seller.brand.index') }}">{{ __('Brands') }}</a></li>
@@ -260,13 +278,19 @@
           </ul>
         </li>
 
-        <li class="dropdown {{ Request::is('seller/settings*') ? 'active' : '' }}">
+        <li class="dropdown {{ Request::is('seller/setting*') ? 'active' : '' }}">
           <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="flaticon-settings"></i> <span>{{ __('Settings') }}</span></a>
           <ul class="dropdown-menu">
             <li><a class="nav-link" href="{{ route('seller.settings.show','shop-settings') }}">{{ __('Shop Settings') }}</a></li>
+            @if(Route::has('admin.payment-geteway.index'))
             <li><a class="nav-link" href="{{ route('seller.settings.show','payment') }}">{{ __('Payment Options') }}</a></li>
-            <li><a class="nav-link" href="{{ route('seller.settings.show','plan') }}">{{ __('Subscriptions') }}</a></li>
             
+            <li><a class="nav-link" href="{{ route('seller.settings.show','plan') }}">{{ __('Subscriptions') }}</a></li>
+            @endif
+            @if(getenv("AUTO_APPROVED_DOMAIN") !== false)
+
+            <li><a class="nav-link" href="{{ route('seller.domain.index') }}">{{ __('Domain Settings') }}</a></li>
+            @endif
           </ul>
         </li>
           <li class="dropdown {{ Request::is('seller/marketing*') ? 'active' : '' }}">
@@ -279,6 +303,13 @@
           
           </ul>
         </li>
+        <li class="{{ Request::is('seller/support*') ? 'active' : '' }}">
+          <a class="nav-link" @if(filter_var($plan_limit['live_support']) == true) href="{{ route('seller.support') }}" @endif>
+           @if(filter_var($plan_limit['live_support']) != true) <i class="fa fa-lock text-danger"></i> @else <i class="fa fa-user"></i>  @endif <span>{{ __('Technical Support') }} </span>
+          </a>
+        </li>
+
+        
         <li class="menu-header">{{ __('SALES CHANNELS') }}</li>
         <li class="dropdown {{ Request::is('seller/setting*') ? 'active' : '' }}">
           <a href="#" class="nav-link has-dropdown"><i class="flaticon-shop"></i> <span>{{ __('Online store') }}</span></a>
@@ -289,11 +320,13 @@
             <li><a href="{{ route('seller.slider.index') }}">{{ __('Sliders') }}</a></li> 
             <li><a href="{{ route('seller.seo.index') }}">{{ __('Seo') }}</a></li> 
 
+           
+
           </ul>
         </li>
 
         <div class="mt-4 mb-4 p-3 hide-sidebar-mini">
-          <a href="{{ domain_info('full_domain') }}" class="btn btn-primary btn-lg btn-block btn-icon-split">
+          <a href="{{ url('/') }}" class="btn btn-primary btn-lg btn-block btn-icon-split">
             <i class="fas fa-external-link-alt"></i>{{ __('Your Website') }}
           </a>
         </div> 

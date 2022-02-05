@@ -8,12 +8,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" type="image/x-icon" href="{{ asset('uploads/favicon.ico') }}">
   <!-- Place favicon.ico in the root directory -->
-<!-- CSS here -->
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/fontawesome-all.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/font.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/default.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/installer/css/style.css') }}">
+
+  <!-- CSS here -->
+  <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/all.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/font.css') }}">
+  <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/default.css') }}">
+  <link rel="stylesheet" href="{{ asset('frontend/assets/css/installer/style.css') }}">
 
 </head>
 <body class="install">
@@ -22,7 +23,7 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
           <![endif]-->
 
-          <?php 
+          <?php
           $phpversion = phpversion();
           $mbstring = extension_loaded('mbstring');
           $bcmath = extension_loaded('bcmath');
@@ -34,7 +35,7 @@
           $xml = extension_loaded('xml');
           $fileinfo = extension_loaded('fileinfo');
           $fopen = ini_get('allow_url_fopen');
-
+          $permission=true;
           $info = [
             'phpversion' => $phpversion,
             'mbstring' => $mbstring,
@@ -48,6 +49,10 @@
             'fileinfo' => $fileinfo,
             'allow_url_fopen' => $fopen,
           ];
+
+          
+          $permissions =new \App\Providers\PermissionsServiceProvider;
+          $permissions=$permissions->check();
           ?>
 
           <!-- requirments-section-start -->
@@ -70,164 +75,177 @@
                       <tr>
                         <td>{{ __('PHP >= 7.3') }}</td>
                         <td>
-                          <?php 
+                          <?php
                           if ($info['phpversion'] >= 7.3) { ?>
                             <i class="fas fa-check"></i>
                             <?php
                           }else{ ?>
                             <i class="fas fa-times"></i>
                             <?php
-                          } 
+                          }
                           ?>
                         </td>
                       </tr>
                       <tr>
                         <td>{{ __('BCMath PHP Extension') }}</td>
                         <td>
-                          <?php 
+                          <?php
                           if ($info['bcmath'] == 1) { ?>
                             <i class="fas fa-check"></i>
                             <?php
                           }else{ ?>
                             <i class="fas fa-times"></i>
                             <?php
-                          } 
+                          }
                           ?>
                         </td>
                       </tr>
                       <tr>
                         <td>{{ __('Ctype PHP Extension') }}</td>
                         <td>
-                         <?php 
+                         <?php
                          if ($info['ctype'] == 1) { ?>
                           <i class="fas fa-check"></i>
                           <?php
                         }else{ ?>
                           <i class="fas fa-times"></i>
                           <?php
-                        } 
+                        }
                         ?>
                       </td>
                     </tr>
                     <tr>
                       <td>{{ __('JSON PHP Extension') }}</td>
                       <td>
-                       <?php 
+                       <?php
                        if ($info['json'] == 1) { ?>
                         <i class="fas fa-check"></i>
                         <?php
                       }else{ ?>
                         <i class="fas fa-times"></i>
                         <?php
-                      } 
+                      }
                       ?>
                     </td>
                   </tr>
                   <tr>
                     <td>{{ __('Mbstring PHP Extension') }}</td>
                     <td>
-                      <?php 
+                      <?php
                       if ($info['mbstring'] == 1) { ?>
                         <i class="fas fa-check"></i>
                         <?php
                       }else{ ?>
                         <i class="fas fa-times"></i>
                         <?php
-                      } 
+                      }
                       ?>
                     </td>
                   </tr>
                   <tr>
                     <td>{{ __('OpenSSL PHP Extension') }}</td>
                     <td>
-                      <?php 
+                      <?php
                       if ($info['openssl'] == 1) { ?>
                         <i class="fas fa-check"></i>
                         <?php
                       }else{ ?>
                         <i class="fas fa-times"></i>
                         <?php
-                      } 
+                      }
                       ?>
                     </td>
                   </tr>
                   <tr>
                     <td>{{ __('PDO PHP Extension') }}</td>
                     <td>
-                      <?php 
+                      <?php
                       if ($info['pdo'] == 1) { ?>
                         <i class="fas fa-check"></i>
                         <?php
                       }else{ ?>
                         <i class="fas fa-times"></i>
                         <?php
-                      } 
+                      }
                       ?>
                     </td>
                   </tr>
                   <tr>
                     <td>{{ __('Tokenizer PHP Extension') }}</td>
                     <td>
-                      <?php 
+                      <?php
                       if ($info['tokenizer'] == 1) { ?>
                         <i class="fas fa-check"></i>
                         <?php
                       }else{ ?>
                         <i class="fas fa-times"></i>
                         <?php
-                      } 
+                      }
                       ?>
                     </td>
                   </tr>
                   <tr>
                     <td>{{ __('XML PHP Extension') }}</td>
                     <td>
-                      <?php 
+                      <?php
                       if ($info['xml'] == 1) { ?>
                         <i class="fas fa-check"></i>
                         <?php
                       }else{ ?>
                         <i class="fas fa-times"></i>
                         <?php
-                      } 
+                      }
                       ?>
                     </td>
                   </tr>
                   <tr>
                     <td>{{ __('Fileinfo PHP Extension') }}</td>
                     <td>
-                      <?php 
+                      <?php
                       if ($info['fileinfo'] == 1) { ?>
                         <i class="fas fa-check"></i>
                         <?php
                       }else{ ?>
                         <i class="fas fa-times"></i>
                         <?php
-                      } 
+                      }
                       ?>
                     </td>
                   </tr>
                   <tr>
                     <td>{{ __('Fopen PHP Extension') }}</td>
                     <td>
-                      <?php 
+                      <?php
                       if ($info['allow_url_fopen'] == 1) { ?>
                         <i class="fas fa-check"></i>
                         <?php
                       }else{ ?>
                         <i class="fas fa-times"></i>
                         <?php
-                      } 
+                      }
                       ?>
                     </td>
                   </tr>
+                  @foreach($permissions['permissions'] as $row)
+                
+                 @if($row['isSet'] == false)
+                 @php
+                 $permission=false;
+                 @endphp
+                  <tr>
+                    <td>{{ $row['folder'] }}</td>
+                    <td>Required permission: 777</td>
+                  </tr>
+                  @endif
+                  @endforeach
                 </tbody>
               </table>
-              <?php 
+              <?php
               $page_url = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-              if ($info['phpversion'] >= 7.3 && $info['mbstring'] == 1 && $info['bcmath'] == 1 && $info['ctype'] == 1 && $info['json'] == 1 && $info['openssl'] == 1 && $info['pdo'] == 1 && $info['tokenizer'] == 1 && $info['xml'] == 1 && $info['fileinfo'] == 1 && $info['allow_url_fopen'] == 1) { ?>
-                <a href="{{ route('install.info') }}" class="btn btn-primary install-btn f-right">{{ __('Next') }}</a>
+              if ($info['phpversion'] >= 7.2 && $info['mbstring'] == 1 && $info['bcmath'] == 1 && $info['ctype'] == 1 && $info['json'] == 1 && $info['openssl'] == 1 && $info['pdo'] == 1 && $info['tokenizer'] == 1 && $info['xml'] == 1 && $info['fileinfo'] == 1 && $info['allow_url_fopen'] == 1 && $permission == true) { ?>
+                <a href="{{ url('/install/purchase') }}" class="btn btn-primary install-btn f-right">{{ __('Next') }}</a>
                 <?php
+
               }else{ ?>
                <a href="#" class="btn btn-primary f-right disabled">{{ __('next') }}</a>
                <?php
@@ -239,7 +257,6 @@
      </section>
 
      <!-- requirments-section-end -->
-
 
    </body>
    </html>

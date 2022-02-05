@@ -164,6 +164,9 @@ function render_products(target,data,additional_class='') {
        if(value.options.length > 0){
         next=true;
        }
+       if(value.affiliate != null){
+        next=true;
+       }
 
 
         if(value.price.starting_date == null || value.price.ending_date == null){

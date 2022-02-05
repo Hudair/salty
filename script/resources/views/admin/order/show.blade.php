@@ -30,11 +30,19 @@
 						</tr>
 						<tr>
 							<td>{{ __('Order Will Be Expired') }}</td>
-							<td><b>{{ $info->will_expired }}</b></td>
+							<td><b>{{ $info->will_expire }}</b></td>
 						</tr>
 						<tr>
 							<td>{{ __('Order Amount') }}</td>
 							<td><b>{{ amount_format($info->amount) }}</b></td>
+						</tr>
+						<tr>
+							<td>{{ __('Order Tax Amount') }}</td>
+							<td><b>{{ amount_format($info->tax) }}</b></td>
+						</tr>
+						<tr>
+							<td>{{ __('Order Total Amount') }}</td>
+							<td><b>{{ amount_format($info->tax+$info->amount) }}</b></td>
 						</tr>
 						<tr>
 							<td>{{ __('Plan Name') }}</td>
@@ -42,23 +50,25 @@
 						</tr>
 						<tr>
 							<td>{{ __('Payment Mode') }}</td>
-							<td><b>{{ $info->payment_method->method->name ?? '' }}</b></td>
+							<td><b>{{ $info->category->name ?? '' }}</b></td>
 						</tr>
 						<tr>
 							<td>{{ __('Transaction Id') }}</td>
-							<td><b>{{ $info->payment_method->trasection_id ?? '' }}</b></td>
+							<td><b>{{ $info->trx }}</b></td>
 						</tr>
 						<tr>
 							<td>{{ __('Transaction Status') }}</td>
-							<td>@if(!empty($info->payment_method))
-								@if($info->payment_method->status==1)
+							<td>
+								@if($info->payment_status==1)
 								<span class="badge badge-success">{{ __('Paid') }}</span>
+								@elseif($row->payment_status == 2)
+								<span class="badge badge-warning">{{ __('Pending') }}</span>
 								@else
 								<span class="badge badge-danger">{{ __('Fail') }}</span>
 								@endif
-								@endif
 							</td>
 						</tr>
+						
 						
 					</table>
 				</div>

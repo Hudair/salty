@@ -34,7 +34,7 @@ class SubscriptionMail extends Mailable
              
         
         return $this->from(env('MAIL_TO'))
-                    ->subject('Subscription')
+                    ->subject('['.strtoupper(env('APP_NAME')).']'.' - Subscription')
                     ->view('email.subscription_invoice',compact('info','comment'));
     }
 }

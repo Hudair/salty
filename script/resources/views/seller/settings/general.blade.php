@@ -23,6 +23,23 @@
                 <li class="nav-item">
                     <a class="nav-link" id="profile-tab4" data-toggle="tab" href="#profile4" role="tab" aria-controls="profile" aria-selected="false">Location</a>
                 </li>
+                @php
+                 $plan=user_limit();
+                 $plan_check=$plan;
+                 $plan=filter_var($plan['pwa']);
+                
+                @endphp
+
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab4" data-toggle="tab" @if($plan==true) href="#pwa" @endif role="tab" aria-controls="profile" aria-selected="false">PWA Settings @if($plan != true) <i class="fa fa-lock text-danger"></i> @endif</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab22" data-toggle="tab" @if(filter_var($plan_check['custom_css'])==true) href="#css_area" @endif role="tab" aria-controls="profile" aria-selected="false">Additional Css @if(filter_var($plan_check['custom_css']) != true) <i class="fa fa-lock text-danger"></i> @endif</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab33" data-toggle="tab" @if(filter_var($plan_check['custom_js'])==true) href="#js_area" @endif role="tab" aria-controls="profile" aria-selected="false">Additional Js @if(filter_var($plan_check['custom_js']) != true) <i class="fa fa-lock text-danger"></i> @endif</a>
+                </li>
 
                 <li class="nav-item">
                     <a class="nav-link" id="contact-tab4" data-toggle="tab" href="#contact4" role="tab" aria-controls="contact" aria-selected="false">Other</a>
@@ -80,11 +97,20 @@
                      <div class="form-group">
                         <label>{{ __('I will sale (shop type)') }}</label> 
                         @php
-                        $shop_type=domain_info('shop_type');
+                        $shop_type=\App\Domain::where('user_id',Auth::id())->first();
+                        $shop_type=$shop_type->shop_type ?? null;
                         @endphp  
                        <select class="form-control" name="shop_type">
                            <option value="1" @if($shop_type == 1) selected="selected" @endif>{{ __('I will sale physical products') }}</option>
                            <option value="0" @if($shop_type == 0) selected="selected" @endif>{{ __('I will sale digital products') }}</option>
+                       </select>
+                     </div>
+                     <div class="form-group">
+                        <label>{{ __('Order Receive Method') }}</label> 
+                       
+                       <select class="form-control" name="order_receive_method">
+                           <option value="whatsapp" @if($order_receive_method == 'whatsapp') selected="selected" @endif>{{ __('I will Receive My Order Via Whatsapp') }}</option>
+                           <option value="email" @if($order_receive_method == 'email') selected="selected" @endif>{{ __('I will Receive My Order Via Email') }}</option>
                        </select>
                      </div>
 
@@ -94,7 +120,7 @@
                          <select class="form-control select2 col-sm-12" name="lanugage[]" multiple="">
                             @foreach($langlist ?? [] as $key => $row)
 
-                             <option value="{{ $row }},{{ $key }}" @if(in_array($row, $my_languages)) selected="" @endif>{{ $key }}</option>
+                             <option value="{{ $row }},{{ $key }}" @if(in_array($key, $my_languages)) selected="" @endif>{{ $key }}</option>
                              @endforeach
                          </select>  
                       </div>
@@ -164,6 +190,104 @@
                      </div>
                  </form>    
             </div>
+            @if($plan==true)
+             <div class="tab-pane fade" id="pwa" role="tabpanel" aria-labelledby="profile-tab4">
+                <form method="post" action="{{ route('seller.settings.store') }}" enctype="multipart/form-data" class="basicform">
+                    @csrf
+                    <input type="hidden" name="type" value="pwa_settings">
+                <div class="form-group">
+                    <label>APP Title</label>
+                    <input class="form-control" name="pwa_app_title" value="{{ $pwa->name ?? '' }}" type="text" value="" required="">
+                </div>
+                <div class="form-group">
+                    <label>App Name (Short Name)</label>
+                    <input class="form-control" name="pwa_app_name" value="{{ $pwa->short_name ?? '' }}" type="text" value="" required="">
+                </div>
+                <div class="form-group">
+                    <label>APP Background Color (Dont use color code)</label>
+                    <input class="form-control" name="pwa_app_background_color" value="{{ $pwa->background_color ?? '' }}" type="text" value="" required="">
+                </div>
+                <div class="form-group">
+                    <label>APP Theme Color</label>
+                    <input class="form-control" name="pwa_app_theme_color" value="{{ $pwa->theme_color ?? '' }}" type="text" value="" required="">
+                </div>
+                <div class="form-group">
+                    <label>APP Main Language</label>
+                    <input class="form-control" name="app_lang" value="{{ $pwa->theme_color ?? '' }}" type="text" value="" required="" placeholder="en-US">
+                    <small>Example: en-US</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>App Icon 128x128</label>
+                    <input class="form-control" name="app_icon_128x128"  type="file"  required="" accept="image/.png">
+                   
+                </div>
+                <div class="form-group">
+                    <label>App Icon 144x144</label>
+                    <input class="form-control" name="app_icon_144x144"  type="file"  required="" accept="image/.png">
+                   
+                </div>
+                <div class="form-group">
+                    <label>App Icon 152x152</label>
+                    <input class="form-control" name="app_icon_152x152"  type="file"  required="" accept="image/.png">
+                   
+                </div>
+                <div class="form-group">
+                    <label>App Icon 192x192</label>
+                    <input class="form-control" name="app_icon_192x192"  type="file"  required="" accept="image/.png">
+                   
+                </div>
+                <div class="form-group">
+                    <label>App Icon 512x512</label>
+                    <input class="form-control" name="app_icon_512x512"  type="file"  required="" accept="image/.png">
+                   
+                </div>
+                <div class="form-group">
+                    <label>App Icon 256x256</label>
+                    <input class="form-control" name="app_icon_256x256"  type="file"  required="" accept="image/.png">
+                   
+                </div>
+                
+                
+                <div class="form-group">
+                         <button class="btn btn-primary float-right col-3 basicbtn" type="submit">Save</button> 
+                     </div>
+                 </form>    
+            </div>
+            @endif
+
+            <div class="tab-pane fade" id="css_area" role="tabpanel" aria-labelledby="contact-tab4">
+                <form method="post" action="{{ route('seller.settings.store') }}" class="basicform">
+                    <input type="hidden" name="type" value="css">
+                   @csrf
+                    <div class="form-group">
+                         <label>Css</label>    
+                         <textarea class="form-control" name="css" required="">{{ $css }}</textarea>
+                    </div>
+                     
+
+                    
+                  
+                    <div class="form-group">
+                         <button class="btn btn-primary float-right col-3 basicbtn" type="submit">Save</button> 
+                     </div>  
+               </form>
+            </div>
+              <div class="tab-pane fade" id="js_area" role="tabpanel" aria-labelledby="contact-tab4">
+                <form method="post" action="{{ route('seller.settings.store') }}" class="basicform">
+                    <input type="hidden" name="type" value="js">
+                   @csrf
+                    <div class="form-group">
+                         <label>Js</label>    
+                         <textarea class="form-control" name="js" required="">{{ $js }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                         <button class="btn btn-primary float-right col-3 basicbtn" type="submit">Save</button> 
+                     </div>  
+               </form>
+            </div>
+
             <div class="tab-pane fade" id="contact4" role="tabpanel" aria-labelledby="contact-tab4">
                 <form method="post" action="{{ route('seller.settings.store') }}" class="basicform" enctype="multipart/form-data">
                     <input type="hidden" name="type" value="theme_settings">
